@@ -2,21 +2,22 @@ import BuyerList from "@/components/BuyerList";
 import PixelCanvas from "@/components/PixelCanvas";
 import StatBox from "@/components/StatBox";
 import StayConnected from "@/components/StayConnected";
-import { Grid, Users } from "lucide-react";
+import { FaUsers } from "react-icons/fa";
+import { MdGridOn } from "react-icons/md";
 
 const stats = [
     {
-        icon: Grid,
+        icon: MdGridOn,
         value: "404",
         label: "PIXELS SOLD",
     },
     {
-        icon: Users,
+        icon: FaUsers,
         value: "1 $USDT",
         label: "PIXELS RATE",
     },
     {
-        icon: Users,
+        icon: FaUsers,
         value: "10 x 10px",
         label: "MINIMUM BUY",
     },

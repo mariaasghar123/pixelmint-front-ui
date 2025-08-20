@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
 import api from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
@@ -11,6 +12,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const router = useRouter()
 
     const checkAuthStatus = useCallback(async () => {
         setLoading(true);
@@ -58,6 +60,7 @@ export const AuthProvider = ({ children }) => {
 
             if (loginResult.success) {
                 toast.success("Logged in successfully!");
+                router.push('/')
                 await checkAuthStatus();
             } else {
                 toast.error(`Login failed: ${loginResult.message || "Unknown error"}`);

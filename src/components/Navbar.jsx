@@ -30,8 +30,9 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-2 relative">
-                    <a className="text-light font-aria mx-2">About the Project</a>
-                    <Button color="buy">Become Affiliate</Button>
+                    <Button>Litepaper</Button>
+                    <Button>About the Project</Button>
+                    <Button>Become Affiliate</Button>
 
                     {!isAuthenticated ? (
                         <Link href="/auth/login">
