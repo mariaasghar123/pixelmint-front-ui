@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useEffect, useState } from "react";
 import TopBar from "./TopBar";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 // --- COLOR VARIABLES ---
 const COLOR_BG_CANVAS = "#18312c";
@@ -310,7 +310,6 @@ export default function PixelGridCanvas4() {
 
     return (
         <div style={{ width: "100%", maxWidth: "100vw", overflow: "hidden", touchAction: "none" }} className="rounded">
-            <ToastContainer />
             <TopBar
                 mousePixelPos={mousePixelPos}
                 lastShapeCoords={lastShapeCoords}
