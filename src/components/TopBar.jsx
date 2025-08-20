@@ -2,7 +2,7 @@
 import { useState } from "react";
 import AuthModal from "./AuthModal";
 import Button from "./ui/Button";
-import { FaExpand, FaSearchPlus, FaSearchMinus } from "react-icons/fa";
+import { FaExpand, FaCompress, FaSearchPlus, FaSearchMinus } from "react-icons/fa";
 import { useAuth } from "./AuthProvider";
 
 function PixelLegend() {
@@ -25,7 +25,9 @@ function PixelLegend() {
 }
 
 function TopBar({
+    isExpanded,
     mousePixelPos,
+    expandClick,
     zoomActive,
     onZoomClick,
     zoomedIn,
@@ -110,8 +112,13 @@ function TopBar({
                             : <FaSearchPlus size={20} />
                         }
                     </button>
-                    <button className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease">
-                        <FaExpand size={20} />
+                    <button
+                        onClick={expandClick}
+                        className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease">
+                        {isExpanded ?
+                            <FaExpand size={20} />
+                            : <FaCompress size={20} />
+                        }
                     </button>
                 </div>
             </div></>

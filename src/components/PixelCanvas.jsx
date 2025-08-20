@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useEffect, useState } from "react";
 import TopBar from "./TopBar";
+import { useToggleFullscreen } from "@/hooks/useFullscreen";
 import { toast } from "react-toastify";
 
 // --- COLOR VARIABLES ---
@@ -65,6 +66,8 @@ function rectOverlaps(rect, existingRects) {
 
 export default function PixelGridCanvas4() {
     const canvasRef = useRef(null);
+    const canvasContainerRef = useRef(null);
+    const [isFullscreen, toggleFullscreen] = useToggleFullscreen(canvasContainerRef);
 
     const [panning, setPanning] = useState(false);
     const [panStart, setPanStart] = useState(null);
@@ -200,18 +203,30 @@ export default function PixelGridCanvas4() {
             return;
         }
 
+        // Center zoom at click location
         if (zoomActive && !zoomedIn) {
-            const pixel = getPixelFromMouse(e);
+            const rect = canvasRef.current.getBoundingClientRect();
+            // Get mouse position relative to canvas (unscaled)
+            const mouseX = (e.clientX - rect.left - offset.x) / (canvasPxSize.scale * zoom);
+            const mouseY = (e.clientY - rect.top - offset.y) / (canvasPxSize.scale * zoom);
+
+            // Now calculate the offset needed to center this point
             const { scale } = canvasPxSize;
+            const zoomLevel = ZOOM_LEVEL;
             const canvasW = PIXEL_CANVAS_WIDTH * scale;
             const canvasH = PIXEL_CANVAS_HEIGHT * scale;
-            const centerX = pixel.x * scale * ZOOM_LEVEL;
-            const centerY = pixel.y * scale * ZOOM_LEVEL;
-            setZoom(ZOOM_LEVEL);
-            setOffset({
-                x: canvasW / 2 - centerX,
-                y: canvasH / 2 - centerY,
-            });
+
+            // Calculate where this pixel would be in zoomed coordinates
+            const centerX = mouseX * scale * zoomLevel;
+            const centerY = mouseY * scale * zoomLevel;
+
+            const newOffset = {
+                x: (canvasW / 2) - centerX,
+                y: (canvasH / 2) - centerY,
+            };
+
+            setZoom(zoomLevel);
+            setOffset(newOffset);
             setZoomedIn(true);
             setZoomActive(false);
             return;
@@ -225,7 +240,6 @@ export default function PixelGridCanvas4() {
         setEndBlock(block);
         setMouseGridPos(block);
     }
-
     function handleMouseMove(e) {
         e.preventDefault();
         const pixel = getPixelFromMouse(e);
@@ -309,8 +323,10 @@ export default function PixelGridCanvas4() {
     }
 
     return (
-        <div style={{ width: "100%", maxWidth: "100vw", overflow: "hidden", touchAction: "none" }} className="rounded">
+        <div ref={canvasContainerRef} style={{ width: "100%", maxWidth: "100vw", overflow: "hidden", touchAction: "none" }} className="rounded">
             <TopBar
+                isExpanded={isFullscreen}
+                expandClick={toggleFullscreen}
                 mousePixelPos={mousePixelPos}
                 lastShapeCoords={lastShapeCoords}
                 zoomActive={zoomActive}
