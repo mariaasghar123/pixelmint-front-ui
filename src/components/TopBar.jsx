@@ -1,7 +1,33 @@
 import Button from "./ui/Button";
-import { FaExpand } from "react-icons/fa";
+import { FaExpand, FaSearchPlus, FaSearchMinus } from "react-icons/fa";
 
-function TopBar({ mouseGridPos, lastShapeCoords }) {
+function PixelLegend() {
+    return (
+        <div className="flex items-center gap-6 bg-[#18312c] rounded-lg px-5 py-[7px] ml-3">
+            <span className="flex items-center gap-2">
+                <span className="inline-block w-5 h-5 rounded bg-dark-800" />
+                <span className="text-green-200 text-lg font-normal">Free</span>
+            </span>
+            <span className="flex items-center gap-2">
+                <span className="inline-block w-5 h-5 rounded bg-error" />
+                <span className="text-green-200 text-lg font-normal">Taken</span>
+            </span>
+            <span className="flex items-center gap-2">
+                <span className="inline-block w-5 h-5 rounded bg-green-300" />
+                <span className="text-green-200 text-lg font-normal">Selected</span>
+            </span>
+        </div>
+    );
+}
+
+function TopBar({
+    mousePixelPos,
+    zoomActive,
+    onZoomClick,
+    zoomedIn,
+    canDraw,
+    onCanDrawToggle
+}) {
     return (
         <div
             style={{
@@ -30,19 +56,45 @@ function TopBar({ mouseGridPos, lastShapeCoords }) {
                     }}
                 >
                     <span>
-                        Position: {mouseGridPos.x !== null && mouseGridPos.y !== null
-                            ? `(${mouseGridPos.x}, ${mouseGridPos.y})`
+                        Pixel: {mousePixelPos?.x !== null && mousePixelPos?.y !== null
+                            ? `(${mousePixelPos.x}, ${mousePixelPos.y})`
                             : "(–,–)"}
                     </span>
                     <span>
-                        Block: 10×10 pixels ($10)
+                        Block: 10x10 Pixels($10)
                     </span>
                 </div>
             </div>
-            <div style={{ display: "flex", gap: 12 }}>
-                <Button>
-                    Buy Pixels
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Button
+                    onClick={onCanDrawToggle}
+                    style={{
+                        background: canDraw ? "#E44A4A" : "#19992c",
+                        color: "#fff"
+                    }}
+                >
+                    {canDraw ? "Revert" : "Buy Pixels"}
                 </Button>
+                {/* Only show the legend when buying pixels */}
+                {canDraw && <PixelLegend />}
+                <button
+                    className={`cursor-pointer p-2 rounded transition duration-150 ease ${zoomActive
+                        ? "bg-[#19992c] ring ring-primary"
+                        : "bg-[#18312c] hover:bg-[#19992c]/80"
+                        }`}
+                    title={zoomedIn ? "Zoom Out" : "Zoom In"}
+                    onClick={onZoomClick}
+                    style={{
+                        color: "#fff",
+                        outline: zoomActive ? "2px solid #19992c" : undefined,
+                        boxShadow: zoomActive ? "0 0 0 2px #19992c inset" : undefined
+                    }}
+                >
+                    {zoomedIn
+                        ? <FaSearchMinus size={20} />
+                        : <FaSearchPlus size={20} />
+                    }
+                </button>
                 <button className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease">
                     <FaExpand size={20} />
                 </button>
@@ -50,6 +102,5 @@ function TopBar({ mouseGridPos, lastShapeCoords }) {
         </div>
     );
 }
-
 
 export default TopBar;
