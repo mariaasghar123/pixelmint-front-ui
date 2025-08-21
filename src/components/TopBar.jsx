@@ -35,13 +35,8 @@ function TopBar({
     onCanDrawToggle
 }) {
     const [showModal, setShowModal] = useState(false);
-    const { isAuthenticated } = useAuth()
 
     const handleBuyPixels = () => {
-        // if (!isAuthenticated) {
-        //     setShowModal(true);
-        //     return;
-        // }
         onCanDrawToggle();
     }
 

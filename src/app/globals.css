@@ -5,6 +5,10 @@
   --foreground: #EBFFF9;
 }
 
+* {
+    outline-color:#98F08C;
+}
+
 @theme inline {
 
   --font-sans: var(--font-geist-sans);
@@ -46,3 +50,4 @@ body {
 a:hover {
     cursor: pointer;
 }
+
