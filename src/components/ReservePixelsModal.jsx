@@ -56,10 +56,10 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                 <div className="text-green-100 mb-3 text-lg ">
                     Please confirm your reservation of the selected pixels.
                 </div>
-                <div className="text-gray-400 mb-6 text-center text-base font-aria">
-                    The selected pixels will be <span className="text-green-200">reserved for 5 minutes</span>.<br />
-                    If you do not complete your transaction within this time, the pixels will be available for purchase by others.
-                </div>
+                {/* <div className="text-gray-400 mb-6 text-center text-base font-aria"> */}
+                {/*     The selected pixels will be <span className="text-green-200">reserved for 5 minutes</span>.<br /> */}
+                {/*     If you do not complete your transaction within this time, the pixels will be available for purchase by others. */}
+                {/* </div> */}
                 <div className="flex gap-8 mb-8 items-stretch">
                     <CoordCard
                         label="Top Left (px)"

@@ -14,7 +14,8 @@ import api from "@/lib/api";
 const COLOR_GRID = "#555";
 const COLOR_PROP_SHAPE = "#E44A4A";
 const COLOR_DRAW_PREVIEW = "#31AF99";
-const COLOR_RESERVATION = "#FFD700";
+const COLOR_RESERVATION = "#3b82f6";
+const BorderWidth = 2;
 const shopverseImg = "/shopverse.png";
 const BLOCK_SIZE = 10;
 const GRID_WIDTH = 125;
@@ -87,13 +88,12 @@ export default function PixelGridCanvas4() {
 
     useEffect(() => {
         const reserved = getReservation();
+        console.log(reserved)
         setActiveReservation(reserved);
         setActiveReservationId(reserved?.reservationId || null);
-        if (reserved) {
+        if (reserved && drawing) {
             setModalCoords(reserved);
-            if (reservation) {
-                setShowReservedPopover(true);
-            }
+            setShowReservedPopover(true);
         }
     }, [isAuthenticated]);
 
@@ -103,7 +103,6 @@ export default function PixelGridCanvas4() {
         eventSource.onmessage = ({ data }) => {
             try {
                 const parsed = JSON.parse(data);
-                console.log("EVENT DATA:", parsed)
                 setAllReservations(prev => [...prev, ...parsed]);
             } catch (err) { }
         };
@@ -185,8 +184,6 @@ export default function PixelGridCanvas4() {
                 allReservations.forEach(reservation => {
                     if (reservation.reservationId == activeReservationId)
                         return
-
-                    console.log(reservation)
 
                     const { topLeft, bottomRight } = reservation?.pixelArea || 100;
                     const start = [
@@ -349,6 +346,7 @@ export default function PixelGridCanvas4() {
     function handleCanDrawToggle() {
         setCanDraw(prev => !prev);
         setDrawing(false);
+        setShowReservedPopover(false)
         setStartBlock(null);
         setEndBlock(null);
     }
@@ -404,9 +402,6 @@ export default function PixelGridCanvas4() {
         setActiveReservationId(null);
     }
 
-    const reservation = getReservation();
-    const showPopover = !!reservation && showReservedPopover;
-
     return (
         <div ref={canvasContainerRef} style={{ width: "100%", maxWidth: "100vw", overflow: "hidden", touchAction: "none" }} className="rounded relative">
             <TopBar
@@ -445,8 +440,8 @@ export default function PixelGridCanvas4() {
                 onContextMenu={handleContextMenu}
             />
             <ReservedShapePopover
-                coords={reservation}
-                open={showPopover}
+                coords={modalCoords}
+                open={showReservedPopover}
                 onCancel={handleCancelTransaction}
                 onContinue={handleContinueTransaction}
             />
@@ -479,6 +474,15 @@ function drawRectOnGrid(ctx, topLeft, bottomRight, blockSize, color) {
     const y1 = Math.min(topLeft[1], bottomRight[1]);
     const x2 = Math.max(topLeft[0], bottomRight[0]);
     const y2 = Math.max(topLeft[1], bottomRight[1]);
-    ctx.fillStyle = color;
+    const px = x1 * blockSize;
+    const py = y1 * blockSize;
+    const width = (x2 - x1 + 1) * blockSize;
+    const height = (y2 - y1 + 1) * blockSize;
+
+    ctx.fillStyle = `${color}33`;
     ctx.fillRect(x1 * blockSize, y1 * blockSize, (x2 - x1 + 1) * blockSize, (y2 - y1 + 1) * blockSize);
+
+    ctx.lineWidth = BorderWidth;
+    ctx.strokeStyle = color;
+    ctx.strokeRect(px, py, width, height);
 }

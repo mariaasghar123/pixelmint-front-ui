@@ -6,9 +6,17 @@ function formatCoords(coord) {
     return Math.floor(coord / 10)
 }
 
+function isValidReservation(reservation) {
+    const timestamp = Number(reservation.reservationId.split("-")[0]);
+    return (Date.now() - timestamp) < 10 * 60 * 1000;
+}
+
 export function getReservation() {
     try {
-        return JSON.parse(localStorage.getItem("reservedPixels"));
+        const raw = JSON.parse(localStorage.getItem("reservedPixels"));
+        if (!Array.isArray(raw)) return null;
+        const reservations = raw.filter(r => isValidReservation(r));
+        return reservations
     } catch {
         return null;
     }
