@@ -7,11 +7,19 @@ const buyerGradients = [
     "linear-gradient(90deg, rgba(192, 192, 192, 0.3) 0%, rgba(192, 192, 192, 0.3) 6%, rgba(192, 192, 192, 0.05) 100%)", // Silver
     "linear-gradient(90deg, rgba(205, 127, 50, 0.3) 0%, rgba(205, 127, 50, 0.3) 6%, rgba(205, 127, 50, 0.05) 100%)", // Bronze
 ];
+
 const buyerBorders = [
     "rgba(255, 215, 0, 0.3)",
     "rgba(192, 192, 192, 0.3)",
     "rgba(205, 127, 50, 0.3)",
 ];
+
+const buyerMedals = [
+    "/1st.png",
+    "/2nd.png",
+    "/3rd.png"
+]
+
 const defaultGradient = "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)";
 const defaultBorder = "rgba(192, 192, 192, 0.3)";
 
@@ -44,12 +52,12 @@ export default function BuyerList({
                     {title}
                 </h2>
             </div>
-            <div className="grid grid-cols-3 gap-6 p-4">
+            <div className="grid grid-cols-5 gap-6 py-4 px-6">
                 {buyers.map((buyer, i) => (
                     <div
                         key={i}
                         className={clsx(
-                            "rounded-xl flex items-center gap-4 px-4 py-3 min-w-[250px]"
+                            "rounded-xl flex flex-col items-start gap-3 px-4 py-3 min-w-[150px]"
                         )}
                         style={{
                             background: showColors
@@ -58,19 +66,31 @@ export default function BuyerList({
                             border: `0.5px solid ${showColors ? (buyerBorders[i] || defaultBorder) : defaultBorder}`,
                         }}
                     >
-                        <Image
-                            src={buyer.avatar}
-                            alt={buyer.name}
-                            width={48}
-                            height={48}
-                            className="rounded-md object-cover"
-                        />
+                        <div className="flex justify-between items-start w-full">
+                            <Image
+                                src={buyer.avatar}
+                                alt={buyer.name}
+                                width={64}
+                                height={64}
+                                className="rounded-md object-cover"
+                            />
+
+                            {(i < 3 && showColors) &&
+                                <Image
+                                    className="mt-1"
+                                    src={buyerMedals[i]}
+                                    alt={buyer.name}
+                                    width={32}
+                                    height={51}
+                                />
+                            }
+                        </div>
                         <div className="flex flex-col gap-1">
-                            <div className="font-bold font-sans">{buyer.name}</div>
-                            <div className="text-light text-xs font-sans">
+                            <div className="font-semibold text-lg font-sans underline">{buyer.name}</div>
+                            <div className="text-light/60 font-sans text-sm">
                                 Bought: {buyer.bought}
                             </div>
-                            <div className="text-light text-xs font-sans opacity-60">
+                            <div className="text-light/60 font-sans text-sm">
                                 Position: {buyer.position}
                             </div>
                         </div>

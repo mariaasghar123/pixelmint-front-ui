@@ -24,6 +24,14 @@ const PIXEL_CANVAS_WIDTH = GRID_WIDTH * BLOCK_SIZE;
 const PIXEL_CANVAS_HEIGHT = GRID_HEIGHT * BLOCK_SIZE;
 const ZOOM_LEVEL = 2;
 
+function formatCoordsArr(coordArr) {
+    return [Math.floor(coordArr[0] / BLOCK_SIZE), Math.floor(coordArr[1] / BLOCK_SIZE)];
+}
+
+function blockToPixelCoords(blockArr) {
+    return [blockArr[0] * BLOCK_SIZE, blockArr[1] * BLOCK_SIZE];
+}
+
 const propShapes = [
     { topLeft: [50, 40], bottomRight: [80, 60], color: COLOR_PROP_SHAPE, image: shopverseImg },
     { topLeft: [15, 5], bottomRight: [30, 14], color: COLOR_PROP_SHAPE, image: shopverseImg },
@@ -50,7 +58,32 @@ async function deleteReservation(reservationId) {
     }
 }
 
-export default function PixelGridCanvas4() {
+function rectOverlaps(rect, rects) {
+    const [x1, y1] = rect.topLeft;
+    const [x2, y2] = rect.bottomRight;
+
+    for (const r of rects) {
+        let rTopLeft, rBottomRight;
+        if (r.pixelArea) {
+            rTopLeft = formatCoordsArr(r.pixelArea.topLeft);
+            rBottomRight = formatCoordsArr(r.pixelArea.bottomRight);
+        } else if (r.topLeft && r.bottomRight) {
+            rTopLeft = r.topLeft;
+            rBottomRight = r.bottomRight;
+        } else {
+            continue;
+        }
+        const [rx1, ry1] = rTopLeft;
+        const [rx2, ry2] = rBottomRight;
+
+        if (!(x2 < rx1 || x1 > rx2 || y2 < ry1 || y1 > ry2)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+export default function PixelGridCanvas() {
     const canvasRef = useRef(null);
     const canvasContainerRef = useRef(null);
     const router = useRouter();
@@ -61,7 +94,6 @@ export default function PixelGridCanvas4() {
     const [startBlock, setStartBlock] = useState(null);
     const [endBlock, setEndBlock] = useState(null);
     const [mousePixelPos, setMousePixelPos] = useState({ x: null, y: null });
-    const [mouseGridPos, setMouseGridPos] = useState({ x: null, y: null });
     const [lastShapeCoords, setLastShapeCoords] = useState(null);
     const [zoomActive, setZoomActive] = useState(false);
     const [zoomedIn, setZoomedIn] = useState(false);
@@ -79,23 +111,29 @@ export default function PixelGridCanvas4() {
     const [showReservedPopover, setShowReservedPopover] = useState(false);
     const [isFullscreen, toggleFullscreen] = useToggleFullscreen(canvasContainerRef);
     const { isAuthenticated } = useAuth();
-    const [activeReservation, setActiveReservation] = useState(() => getReservation());
+    const [activeReservation, setActiveReservation] = useState(() => {
+        const reservations = getReservation();
+        return reservations?.length > 0 ? reservations[0] : null;
+    });
     const [allReservations, setAllReservations] = useState([]);
     const [activeReservationId, setActiveReservationId] = useState(() => {
-        const r = getReservation();
-        return r?.reservationId || null;
+        const reservations = getReservation();
+        return reservations?.length > 0 ? reservations[0]?.reservationId : null;
     });
 
     useEffect(() => {
-        const reserved = getReservation();
-        console.log(reserved)
-        setActiveReservation(reserved);
-        setActiveReservationId(reserved?.reservationId || null);
-        if (reserved && drawing) {
-            setModalCoords(reserved);
+        const reservations = getReservation();
+        setActiveReservation(reservations ? reservations : null);
+        setActiveReservationId(reservations ? reservations?.reservationId : null);
+        if (reservations && drawing) {
+            const coords = {
+                topLeft: reservations.topLeft,
+                bottomRight: (reservations.bottomRight)
+            }
+            setModalCoords(coords);
             setShowReservedPopover(true);
         }
-    }, [isAuthenticated]);
+    }, [drawing]);
 
     useEffect(() => {
         const streamUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/pixel/reservation-stream`;
@@ -183,18 +221,11 @@ export default function PixelGridCanvas4() {
                 drawRectOnGrid(ctx, rect.topLeft, rect.bottomRight, BLOCK_SIZE, COLOR_PROP_SHAPE);
                 allReservations.forEach(reservation => {
                     if (reservation.reservationId == activeReservationId)
-                        return
+                        return;
 
-                    const { topLeft, bottomRight } = reservation?.pixelArea || 100;
-                    const start = [
-                        Math.floor(topLeft[0] / BLOCK_SIZE),
-                        Math.floor(topLeft[1] / BLOCK_SIZE)
-                    ];
-                    const end = [
-                        Math.floor(bottomRight[0] / BLOCK_SIZE),
-                        Math.floor(bottomRight[1] / BLOCK_SIZE)
-                    ];
-
+                    // block coordinates for drawing
+                    const start = formatCoordsArr(reservation?.pixelArea?.topLeft || [0, 0]);
+                    const end = formatCoordsArr(reservation?.pixelArea?.bottomRight || [0, 0]);
                     drawRectOnGrid(ctx, start, end, BLOCK_SIZE, COLOR_RESERVATION);
                 });
             } else if (rect.image && loadedImages[rect.image]) {
@@ -204,17 +235,10 @@ export default function PixelGridCanvas4() {
             }
         }
 
-
         if (activeReservation) {
-            const { topLeft, bottomRight } = activeReservation;
-            const start = [
-                Math.floor(topLeft[0] / BLOCK_SIZE),
-                Math.floor(topLeft[1] / BLOCK_SIZE)
-            ];
-            const end = [
-                Math.floor(bottomRight[0] / BLOCK_SIZE),
-                Math.floor(bottomRight[1] / BLOCK_SIZE)
-            ];
+            // block coordinates for drawing
+            const start = formatCoordsArr(activeReservation.topLeft);
+            const end = formatCoordsArr(activeReservation.bottomRight);
             drawRectOnGrid(ctx, start, end, BLOCK_SIZE, COLOR_DRAW_PREVIEW);
         }
 
@@ -223,6 +247,22 @@ export default function PixelGridCanvas4() {
         }
         ctx.restore();
     }, [drawing, startBlock, endBlock, canvasPxSize, offset, zoom, loadedImages, canDraw, allReservations, activeReservation]);
+
+    useEffect(() => {
+        function handleResize() {
+            const parent = canvasRef.current?.parentNode;
+            if (parent) {
+                const maxWidth = parent.offsetWidth;
+                const scale = maxWidth / PIXEL_CANVAS_WIDTH;
+                setCanvasPxSize({
+                    width: PIXEL_CANVAS_WIDTH * scale,
+                    height: PIXEL_CANVAS_HEIGHT * scale,
+                    scale: scale,
+                });
+            }
+        }
+        handleResize();
+    }, [isFullscreen]);
 
     function getPixelFromMouse(event) {
         const rect = canvasRef.current.getBoundingClientRect();
@@ -286,7 +326,6 @@ export default function PixelGridCanvas4() {
         setDrawing(true);
         setStartBlock(block);
         setEndBlock(block);
-        setMouseGridPos({ x: block[0], y: block[1] });
     }
 
     function handleMouseMove(e) {
@@ -294,7 +333,6 @@ export default function PixelGridCanvas4() {
         const pixel = getPixelFromMouse(e);
         setMousePixelPos(pixel);
         const block = getBlockFromMouse(e);
-        setMouseGridPos({ x: block[0], y: block[1] });
         if (drawing) {
             setEndBlock(block);
         } else if (panning && panStart) {
@@ -315,14 +353,35 @@ export default function PixelGridCanvas4() {
             return;
         }
         if (drawing && canDraw && startBlock && endBlock) {
+            // Always store and check shapes in block coordinates
             const x1 = Math.min(startBlock[0], endBlock[0]);
             const y1 = Math.min(startBlock[1], endBlock[1]);
             const x2 = Math.max(startBlock[0], endBlock[0]);
             const y2 = Math.max(startBlock[1], endBlock[1]);
-            const coords = {
-                topLeft: [x1 * BLOCK_SIZE, y1 * BLOCK_SIZE],
-                bottomRight: [(x2 + 1) * BLOCK_SIZE - 1, (y2 + 1) * BLOCK_SIZE - 1]
+            const blockCoords = {
+                topLeft: [x1, y1],
+                bottomRight: [x2, y2]
             };
+
+            if (rectOverlaps(blockCoords, allReservations) || rectOverlaps(blockCoords, propShapes)) {
+                toast.error("Cannot reserve overlapping pixels. Please select a free area.");
+                setDrawing(false);
+                setStartBlock(null);
+                setEndBlock(null);
+                return;
+            }
+
+            // Convert block coordinates to pixel coordinates for API, modal, drawing
+            const pxTopLeft = blockToPixelCoords(blockCoords.topLeft);
+            const pxBottomRight = [
+                (blockCoords.bottomRight[0] + 1) * BLOCK_SIZE - 1,
+                (blockCoords.bottomRight[1] + 1) * BLOCK_SIZE - 1
+            ];
+            const coords = {
+                topLeft: pxTopLeft,
+                bottomRight: pxBottomRight
+            };
+
             setLastShapeCoords(coords);
             setModalCoords(coords);
             setShowReserveModal(true);
@@ -345,8 +404,9 @@ export default function PixelGridCanvas4() {
 
     function handleCanDrawToggle() {
         setCanDraw(prev => !prev);
-        setDrawing(false);
-        setShowReservedPopover(false)
+        setDrawing(p => !p);
+        if (activeReservation)
+            setShowReservedPopover(p => !p)
         setStartBlock(null);
         setEndBlock(null);
     }
@@ -380,7 +440,6 @@ export default function PixelGridCanvas4() {
 
     function handleContinueTransaction() {
         if (!isAuthenticated) {
-            localStorage.setItem("showPopoverAfterAuth", "true");
             router.push('/auth/login');
             return;
         }
@@ -469,6 +528,7 @@ function drawImageOnGrid(ctx, topLeft, bottomRight, blockSize, img) {
     ctx.drawImage(img, x1 * blockSize, y1 * blockSize, width, height);
 }
 
+// Accepts block coordinates for drawing
 function drawRectOnGrid(ctx, topLeft, bottomRight, blockSize, color) {
     const x1 = Math.min(topLeft[0], bottomRight[0]);
     const y1 = Math.min(topLeft[1], bottomRight[1]);
@@ -480,7 +540,7 @@ function drawRectOnGrid(ctx, topLeft, bottomRight, blockSize, color) {
     const height = (y2 - y1 + 1) * blockSize;
 
     ctx.fillStyle = `${color}33`;
-    ctx.fillRect(x1 * blockSize, y1 * blockSize, (x2 - x1 + 1) * blockSize, (y2 - y1 + 1) * blockSize);
+    ctx.fillRect(px, py, width, height);
 
     ctx.lineWidth = BorderWidth;
     ctx.strokeStyle = color;

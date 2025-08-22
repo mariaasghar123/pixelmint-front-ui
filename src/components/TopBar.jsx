@@ -119,7 +119,7 @@ function TopBar({
                         <button
                             onClick={expandClick}
                             className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease">
-                            {isExpanded ?
+                            {!isExpanded ?
                                 <FaExpand size={20} />
                                 : <FaCompress size={20} />
                             }

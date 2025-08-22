@@ -1,10 +1,8 @@
 import localFont from "next/font/local"
 import { ToastContainer } from "react-toastify";
 
-import QueryProvider from "@/components/QueryProvider";
+import AppProviders from "@/components/AppProviders";
 import "./globals.css";
-import { AuthProvider } from "@/components/AuthProvider";
-import Loader from "@/components/ui/Loader";
 
 const ari = localFont({
     src: [
@@ -32,7 +30,6 @@ export const metadata = {
     description: "Digital Billboard",
 };
 
-
 export default function RootLayout({ children }) {
     return (
         <html lang="en">
@@ -44,12 +41,9 @@ export default function RootLayout({ children }) {
                     position="bottom-right"
                     pauseOnHover
                 />
-                <QueryProvider>
-                    <AuthProvider>
-                        <Loader />
-                        {children}
-                    </AuthProvider>
-                </QueryProvider>
+                <AppProviders>
+                    {children}
+                </AppProviders>
             </body>
         </html>
     );

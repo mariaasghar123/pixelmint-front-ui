@@ -31,7 +31,7 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-2 relative">
                     <Button className="bg-green-100/10 border border-green-100 text-green-100">
-                        About the Project
+                        About
                     </Button>
                     <Button className="bg-green-100/10 border border-green-100 text-green-100">
                         Litepaper

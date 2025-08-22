@@ -42,6 +42,18 @@ const buyers = [
         bought: "45x40 px",
         position: "(--, --)",
     },
+    {
+        name: "Shopverse",
+        avatar: "/shopverse.png",
+        bought: "45x40 px",
+        position: "(--, --)",
+    },
+    {
+        name: "Shopverse",
+        avatar: "/shopverse.png",
+        bought: "45x40 px",
+        position: "(--, --)",
+    }
 ];
 
 export default function Home() {

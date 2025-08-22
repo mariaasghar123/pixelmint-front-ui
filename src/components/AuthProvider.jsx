@@ -1,105 +1,62 @@
 "use client";
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext } from "react";
+import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { toast } from "react-toastify";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const router = useRouter()
+    const { address, isConnected } = useAccount();
+    const { connect, connectors, isLoading: connectLoading } = useConnect();
+    const { signMessageAsync, isLoading: signLoading } = useSignMessage();
+    const { disconnect } = useDisconnect();
+    const router = useRouter();
 
-    const checkAuthStatus = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await api.get("/auth/status");
-            setIsAuthenticated(true);
-            setUser(res.data.payload?.user || null);
-        } catch (error) {
-            setIsAuthenticated(false);
-            setUser(null);
-        }
-        setLoading(false);
-    }, []);
-
-    const connectMetaMask = useCallback(async () => {
-        if (typeof window === "undefined" || !window.ethereum || !window.ethereum.isMetaMask) {
-            toast.error("MetaMask extension not detected. Please install MetaMask and refresh the page.");
+    // Authenticate
+    const authenticate = async () => {
+        if (!address) {
+            toast.error("Please connect your wallet first.");
             return;
         }
-        toast.info("Connecting to MetaMask...");
         try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const walletAddress = accounts[0];
-
-            // Get nonce
-            const nonceRes = await api.post('/auth/nonce', { walletAddress });
+            // 1. Get nonce from backend
+            const nonceRes = await api.post('/auth/nonce', { walletAddress: address });
             const nonce = nonceRes.data.payload.nonce;
 
-            // Sign nonce
-            const signedToken = await window.ethereum.request({
-                method: "personal_sign",
-                params: [nonce, walletAddress],
+            // 2. Sign nonce using wagmi
+            const signature = await signMessageAsync({ message: nonce });
+
+            // 3. Send signature to backend
+            const loginRes = await api.post("/auth/connect", {
+                walletAddress: address,
+                nonce,
+                signature,
             });
 
-            // Connect wallet
-            const loginRes = await api.post(
-                "/auth/connect",
-                {
-                    walletAddress,
-                    nonce,
-                    signature: signedToken,
-                }
-            );
-            const loginResult = loginRes.data;
-
-            if (loginResult.success) {
-                toast.success("Logged in successfully!");
-                router.push('/')
-                await checkAuthStatus();
+            if (loginRes.data.success) {
+                toast.success("Logged in!");
+                router.push("/");
             } else {
-                toast.error(`Login failed: ${loginResult.message || "Unknown error"}`);
-                setIsAuthenticated(false);
-                setUser(null);
+                toast.error(`Login failed: ${loginRes.data.message || "Unknown error"}`);
             }
         } catch (err) {
-            console.error("MetaMask login error:", err);
-            toast.error("Failed to connect or authenticate with MetaMask.");
-            setIsAuthenticated(false);
-            setUser(null);
+            toast.error("Authentication failed.");
         }
-    }, [checkAuthStatus]);
-
-    const logout = useCallback(async () => {
-        setLoading(true);
-        try {
-            await api.post("/auth/disconnect");
-            toast.info("Logged out.");
-            await checkAuthStatus();
-        } catch (err) {
-            toast.error("Failed to logout.");
-        }
-        setLoading(false);
-    }, [checkAuthStatus]);
-
-    // Check authentication status on mount
-    useEffect(() => {
-        checkAuthStatus();
-    }, [checkAuthStatus]);
+    };
 
     return (
         <AuthContext.Provider value={{
-            user,
-            loading,
-            connectMetaMask,
-            logout,
-            isAuthenticated,
-            checkAuthStatus,
+            address,
+            isConnected,
+            connect,
+            connectors,
+            connectLoading,
+            authenticate,
+            logout: disconnect,
+            signLoading,
         }}>
             {children}
         </AuthContext.Provider>
