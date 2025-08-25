@@ -57,7 +57,6 @@ export default function Login() {
                     </div>
                 </div>
 
-                {/* Use AppKit.Modal.open() to trigger wallet connection */}
                 {!isConnected ? (
                     <Button
                         className="mt-5 w-full py-3"

@@ -2,7 +2,7 @@ import BuyerList from "@/components/BuyerList";
 import PixelCanvas from "@/components/PixelCanvas";
 import StatBox from "@/components/StatBox";
 import StayConnected from "@/components/StayConnected";
-import { FaUsers } from "react-icons/fa";
+import { FaClock, FaUsers } from "react-icons/fa";
 import { MdGridOn } from "react-icons/md";
 
 const stats = [
@@ -65,8 +65,9 @@ export default function Home() {
                 ))}
             </div>
             <PixelCanvas />
-            <BuyerList title="Biggest Buyers" buyers={buyers} showCrown={true} />
-            <BuyerList buyers={buyers} showColors={false} />
+            <BuyerList title="Biggest Buyers" buyers={buyers} iconColor="#FF9900" />
+            <BuyerList buyers={buyers} showColors={false} icon={FaClock} />
+            <BuyerList buyers={buyers} showColors={false} icon={FaUsers} />
             <StayConnected />
         </main>
     )

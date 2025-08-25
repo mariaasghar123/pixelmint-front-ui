@@ -15,21 +15,17 @@ export const AuthProvider = ({ children }) => {
     const { disconnect } = useDisconnect();
     const router = useRouter();
 
-    // Authenticate
     const authenticate = async () => {
         if (!address) {
             toast.error("Please connect your wallet first.");
             return;
         }
         try {
-            // 1. Get nonce from backend
             const nonceRes = await api.post('/auth/nonce', { walletAddress: address });
             const nonce = nonceRes.data.payload.nonce;
 
-            // 2. Sign nonce using wagmi
             const signature = await signMessageAsync({ message: nonce });
 
-            // 3. Send signature to backend
             const loginRes = await api.post("/auth/connect", {
                 walletAddress: address,
                 nonce,

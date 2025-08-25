@@ -26,29 +26,26 @@ const defaultBorder = "rgba(192, 192, 192, 0.3)";
 export default function BuyerList({
     title = "Recent buyers",
     buyers,
-    showCrown = false,
+    icon: Icon = FaCrown,
+    iconColor = '#FFFFFF',
     showColors = true
 }) {
     return (
         <section className="w-full rounded-lg overflow-hidden" style={{ border: `0.5px solid ${defaultBorder}` }}>
             <div className="bg-dark-800 p-4 flex items-center gap-2">
                 <h2 className="text-light text-2xl font-semibold font-ari flex items-center gap-3">
-                    {showCrown && (
-                        <span
-                            className="rounded-lg p-2 flex items-center justify-center"
-                            style={{
-                                background: "#FF990026",
-                            }}
-                        >
-                            <FaCrown
-                                size={24}
-                                color="#FF9900"
-                                strokeWidth={2}
-                                fill="#FF9900"
-                                style={{ background: "transparent", borderRadius: "50%" }}
-                            />
-                        </span>
-                    )}
+                    <span
+                        className="rounded-lg p-2 flex items-center justify-center"
+                        style={{
+                            background: `${iconColor}26`
+                        }}
+                    >
+                        <Icon
+                            strokeWidth={2}
+                            className="bg-transparent rounded-full w-7 h-7"
+                            style={{ color: iconColor }}
+                        />
+                    </span>
                     {title}
                 </h2>
             </div>
