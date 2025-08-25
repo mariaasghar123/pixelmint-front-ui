@@ -5,18 +5,19 @@ import { useEffect } from "react";
 import Loader from "./ui/Loader";
 
 export default function ProtectedRoute({ allowedRoles, children }) {
-    const { isAuthenticated, user } = useAuth();
+    const { user } = useAuth();
+    console.log(user)
     const router = useRouter();
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!user?.user) {
             router.replace("/auth/login");
-        } else if (allowedRoles && !allowedRoles.includes(user?.role)) {
+        } else if (allowedRoles && !allowedRoles.includes(user?.user.role)) {
             router.replace("/");
         }
-    }, [isAuthenticated, user, allowedRoles, router]);
+    }, [user, allowedRoles, router]);
 
-    if (!isAuthenticated || (allowedRoles && !allowedRoles.includes(user?.role))) {
+    if (allowedRoles && !allowedRoles.includes(user?.role)) {
         return <Loader />;
     }
 

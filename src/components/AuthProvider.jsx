@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         queryFn: async () => {
             try {
                 const res = await api.get("/auth/status");
-                return JSON.stringify(res.data.payload);
+                return res.data.payload;
             } catch (err) {
                 console.error(err)
             }
@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }) => {
             if (loginRes.data.success) {
                 toast.success("Logged in!");
                 refetchStatus();
+                queryClient.invalidateQueries(['auth-status'])
                 router.push("/");
             } else {
                 toast.error(`Login failed: ${loginRes.data.message || "Unknown error"}`);
@@ -71,7 +72,7 @@ export const AuthProvider = ({ children }) => {
             refetchStatus();
             queryClient.setQueryData(['auth-status'], null)
             toast.success("Logged out!");
-            router.push("/login");
+            router.push("/auth/login");
         } catch (err) {
             toast.error("Logout failed.");
         }

@@ -110,7 +110,7 @@ export default function PixelGridCanvas() {
     const [modalCoords, setModalCoords] = useState(null);
     const [showReservedPopover, setShowReservedPopover] = useState(false);
     const [isFullscreen, toggleFullscreen] = useToggleFullscreen(canvasContainerRef);
-    const { isAuthenticated } = useAuth();
+    const { user: isAuthenticated } = useAuth();
     const [activeReservation, setActiveReservation] = useState(() => {
         const reservations = getReservation();
         return reservations?.length > 0 ? reservations[0] : null;

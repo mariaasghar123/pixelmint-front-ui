@@ -38,7 +38,7 @@ export default function Navbar() {
                     </Button>
                     <Button>Become Affiliate</Button>
 
-                    {!user?.authenticated ? (
+                    {!user ? (
                         <Link href="/auth/login">
                             <Button color="connect" disabled={loading}>Connect Wallet</Button>
                         </Link>

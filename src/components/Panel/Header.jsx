@@ -49,12 +49,14 @@ export default function Header() {
                 <h2 className="text-2xl font-semibold text-light">{title}</h2>
                 <span className="text-lg text-gray-400">{subtitle}</span>
             </div>
-            {
-                btnText &&
-                <Button className="text-lg mr-4">{btnText}</Button>
-            }
-            <Button className="text-lg h-full" onClick={() => router.push("/")}>Home</Button>
+            <div className="flex gap-1">
+                {
+                    btnText &&
+                    <Button className="text-lg mr-4">{btnText}</Button>
+                }
+                <Button className="text-lg h-full" onClick={() => router.push("/")}>Home</Button>
+            </div>
 
-        </header>
+        </header >
     );
 }
