@@ -26,7 +26,8 @@
   --color-dark-800: #002420;
   --color-dark-700: #00302A;
   --color-dark-600: #123D34;
-  --color-dark-500: #165E4D;
+  --color-dark-500: #224C38;
+  --color-dark-400: #165E4D;
 
   --color-light: #EBFFF9;
   --color-green-100:#98F08C;
@@ -53,4 +54,8 @@ a:hover {
 
 :host wui-ux-by-reown {
     display: none !important;
+}
+
+button:hover {
+    cursor: pointer;
 }

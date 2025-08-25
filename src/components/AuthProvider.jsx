@@ -4,6 +4,7 @@ import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { toast } from "react-toastify";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -14,6 +15,25 @@ export const AuthProvider = ({ children }) => {
     const { signMessageAsync, isLoading: signLoading } = useSignMessage();
     const { disconnect } = useDisconnect();
     const router = useRouter();
+    const queryClient = useQueryClient()
+
+    const {
+        data: userData,
+        isLoading: statusLoading,
+        refetch: refetchStatus,
+    } = useQuery({
+        queryKey: ["auth-status"],
+        queryFn: async () => {
+            try {
+                const res = await api.get("/auth/status");
+                return JSON.stringify(res.data.payload);
+            } catch (err) {
+                console.error(err)
+            }
+            return null;
+        },
+        staleTime: 2700000
+    });
 
     const authenticate = async () => {
         if (!address) {
@@ -34,6 +54,7 @@ export const AuthProvider = ({ children }) => {
 
             if (loginRes.data.success) {
                 toast.success("Logged in!");
+                refetchStatus();
                 router.push("/");
             } else {
                 toast.error(`Login failed: ${loginRes.data.message || "Unknown error"}`);
@@ -43,16 +64,32 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const logout = async () => {
+        try {
+            await api.post("/auth/disconnect", {});
+            disconnect();
+            refetchStatus();
+            queryClient.setQueryData(['auth-status'], null)
+            toast.success("Logged out!");
+            router.push("/login");
+        } catch (err) {
+            toast.error("Logout failed.");
+        }
+    };
+
     return (
         <AuthContext.Provider value={{
+            user: userData,
             address,
             isConnected,
             connect,
             connectors,
             connectLoading,
             authenticate,
-            logout: disconnect,
+            logout,
             signLoading,
+            loading: statusLoading,
+            refetchStatus,
         }}>
             {children}
         </AuthContext.Provider>

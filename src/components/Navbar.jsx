@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import UserIcon from "@/components/ui/UserIcon";
 
 export default function Navbar() {
-    const { isAuthenticated, user, logout, loading } = useAuth();
+    const { logout, loading, user } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleProfileClick = () => setDropdownOpen((open) => !open);
@@ -38,7 +38,7 @@ export default function Navbar() {
                     </Button>
                     <Button>Become Affiliate</Button>
 
-                    {!isAuthenticated ? (
+                    {!user?.authenticated ? (
                         <Link href="/auth/login">
                             <Button color="connect" disabled={loading}>Connect Wallet</Button>
                         </Link>
