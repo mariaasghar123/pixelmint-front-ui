@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --background: #123D34;
   --foreground: #EBFFF9;
@@ -58,4 +60,18 @@ a:hover {
 
 button:hover {
     cursor: pointer;
+}
+
+.buyer-swiper .swiper-pagination {
+  position: static;
+  margin-top: 1rem;
+}
+
+.buyer-swiper .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 1;
+}
+
+.buyer-swiper .swiper-pagination-bullet-active {
+  background: rgba(255, 255, 255, 0.8);
 }

@@ -1,9 +1,9 @@
-import BuyerList from "@/components/BuyerList";
-import PixelCanvas from "@/components/PixelCanvas";
-import StatBox from "@/components/StatBox";
-import StayConnected from "@/components/StayConnected";
-import { FaClock, FaUsers } from "react-icons/fa";
-import { MdGridOn } from "react-icons/md";
+import BuyerList from "@/components/BuyerList"
+import PixelCanvas from "@/components/PixelCanvas"
+import StatBox from "@/components/StatBox"
+import StayConnected from "@/components/StayConnected"
+import { FaClock, FaUsers } from "react-icons/fa"
+import { MdGridOn } from "react-icons/md"
 
 const stats = [
     {
@@ -21,7 +21,12 @@ const stats = [
         value: "10 x 10px",
         label: "MINIMUM BUY",
     },
-];
+]
+
+const icons = {
+    Clock: FaClock,
+    Users: FaUsers,
+}
 
 const buyers = [
     {
@@ -53,22 +58,23 @@ const buyers = [
         avatar: "/shopverse.png",
         bought: "45x40 px",
         position: "(--, --)",
-    }
-];
+    },
+]
 
 export default function Home() {
     return (
         <main className="w-[90%] mx-auto flex flex-col gap-6 my-6">
-            <div className="flex gap-4 justify-end">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
                 {stats.map((stat, i) => (
                     <StatBox key={i} {...stat} />
                 ))}
             </div>
             <PixelCanvas />
             <BuyerList title="Biggest Buyers" buyers={buyers} iconColor="#FF9900" />
-            <BuyerList buyers={buyers} showColors={false} icon={FaClock} />
-            <BuyerList buyers={buyers} showColors={false} icon={FaUsers} />
+            <BuyerList buyers={buyers} showColors={false} />
+            <BuyerList buyers={buyers} showColors={false} />
             <StayConnected />
         </main>
     )
 }
+

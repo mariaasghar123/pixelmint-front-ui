@@ -74,7 +74,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                     <Button onClick={handleConfirm} disabled={loading}>
                         {loading ? "Confirming..." : "Confirm Reservation"}
                     </Button>
-                    <Button onClick={handleClose} className="!bg-error !hover:bg-error/20" disabled={loading}>
+                    <Button onClick={handleClose} className="!bg-error !hover:bg-error/20 !border-none" disabled={loading}>
                         Cancel
                     </Button>
                 </div>

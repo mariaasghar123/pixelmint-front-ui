@@ -3,50 +3,67 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MdClose } from "react-icons/md";
 import Button from "./ui/Button";
-import { clearReservation } from "@/utils/localStorage.utils";
+import { clearReservation, getReservation } from "@/utils/localStorage.utils";
 import ImageUploadBox from "./ui/ImageUpload";
 import Input from "./ui/Input";
 import { adModalSchema } from "@/schemas/ad.schema";
 import { toast } from "react-toastify";
+import { purchasePixelMutation } from "@/api/pixel";
+import { useMutation } from "@tanstack/react-query";
 
 export default function CompleteTransactionModal({ open, onClose }) {
     const {
         register,
         handleSubmit,
+        setValue,
+        reset,
         formState: { errors, isSubmitted },
     } = useForm({
         resolver: zodResolver(adModalSchema),
         defaultValues: {
-            name: "",
+            displayName: "",
             adTitle: "",
             websiteUrl: "",
             telegramContact: "",
             referredBy: "",
-            image: null,
+            adImage: null,
         },
         mode: "onTouched",
     });
 
+    const reservation = getReservation()
+
+    const createPurchase = useMutation({
+        mutationFn: purchasePixelMutation,
+        onSuccess: (_data) => {
+            toast.success('Pixel purchase successful!');
+        },
+        onError: (error) => {
+            toast.error(error.message || 'Pixel purchase failed!');
+        },
+    });
+
     function handleClose() {
-        clearReservation();
+        reset()
+        // clearReservation();
         onClose();
     }
 
     function onFormSubmit(data) {
-        handleClose();
+        createPurchase.mutate({ ...data, pixelArea: reservation })
+        // handleClose();
     }
 
     if (!open) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-dark-700 rounded-2xl px-12 py-8 min-w-[500px] shadow-2xl border border-green-400 flex flex-col items-start relative">
-                {/* Cross icon in top right */}
+            <div className="bg-dark-700 rounded-2xl px-12 py-8 max-w-[500px] w-full shadow-2xl border border-green-400 flex flex-col items-start relative">
                 <button
                     type="button"
                     aria-label="Close"
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-light hover:text-error transition-colors cursor-pointer"
+                    onClick={handleClose}
+                    className="absolute top-10 right-10 text-light hover:text-error transition-colors cursor-pointer"
                 >
                     <MdClose size={28} />
                 </button>
@@ -64,8 +81,8 @@ export default function CompleteTransactionModal({ open, onClose }) {
                         label="Name"
                         name="name"
                         placeholder="Enter your name"
-                        error={errors.name?.message}
-                        {...register("name")}
+                        error={errors.displayName?.message}
+                        {...register("displayName")}
                     />
                     <Input
                         label="Ad Title"
@@ -81,23 +98,32 @@ export default function CompleteTransactionModal({ open, onClose }) {
                         error={errors.websiteUrl?.message}
                         {...register("websiteUrl")}
                     />
-                    <Input
-                        label="Telegram Contact (Optional)"
-                        name="telegramContact"
-                        placeholder="@TelegramTag"
-                        error={errors.telegramContact?.message}
-                        {...register("telegramContact")}
-                    />
-                    <Input
-                        label="Referred By (Optional)"
-                        name="referredBy"
-                        placeholder="Referred by"
-                        error={errors.referredBy?.message}
-                        {...register("referredBy")}
-                    />
+
+                    {/* <Input */}
+                    {/*     label="Telegram Contact (Optional)" */}
+                    {/*     name="telegramContact" */}
+                    {/*     placeholder="@TelegramTag" */}
+                    {/*     error={errors.telegramContact?.message} */}
+                    {/*     {...register("telegramContact")} */}
+                    {/* /> */}
+                    {/* <Input */}
+                    {/*     label="Referred By (Optional)" */}
+                    {/*     name="referredBy" */}
+                    {/*     placeholder="Referred by" */}
+                    {/*     error={errors.referredBy?.message} */}
+                    {/*     {...register("referredBy")} */}
+                    {/* /> */}
 
                     <div className="mb-8">
-                        <ImageUploadBox />
+                        <ImageUploadBox
+                            label="Upload Ad Image"
+                            onUpload={file => setValue("adImage", file, { shouldValidate: true })}
+                        />
+                        {errors.adImage && (
+                            <div className="text-error text-sm mt-2">
+                                {errors.adImage.message}
+                            </div>
+                        )}
                     </div>
 
                     <Button type="submit" className="w-full">

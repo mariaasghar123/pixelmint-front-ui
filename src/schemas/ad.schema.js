@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const adModalSchema = z.object({
-    name: z.string()
+    displayName: z.string()
         .min(2, "Name must be at least 2 characters")
         .max(50, "Name must be at most 50 characters"),
 
@@ -20,6 +20,12 @@ export const adModalSchema = z.object({
 
     referredBy: z.string()
         .max(50, "Referred By must be at most 50 characters")
-        .optional()
+        .optional(),
 
+    adImage: z
+        .instanceof(File, { message: "Ad image is required and must be a valid file" })
+        .refine(
+            (file) => !!file && file.type.startsWith("image/") && file.size < 2_000_000,
+            { message: "Ad image must be an image file less than 2MB" }
+        ),
 });

@@ -1,34 +1,32 @@
-import Image from "next/image";
-import clsx from "clsx";
-import { FaCrown } from "react-icons/fa";
+"use client"
+
+import Image from "next/image"
+import clsx from "clsx"
+import { FaCrown } from "react-icons/fa"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Autoplay, Pagination } from "swiper/modules"
+import "swiper/css"
+import "swiper/css/pagination"
 
 const buyerGradients = [
     "linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.2) 6%, rgba(255, 215, 0, 0.05) 100%)", // Gold
     "linear-gradient(90deg, rgba(192, 192, 192, 0.3) 0%, rgba(192, 192, 192, 0.3) 6%, rgba(192, 192, 192, 0.05) 100%)", // Silver
     "linear-gradient(90deg, rgba(205, 127, 50, 0.3) 0%, rgba(205, 127, 50, 0.3) 6%, rgba(205, 127, 50, 0.05) 100%)", // Bronze
-];
-
-const buyerBorders = [
-    "rgba(255, 215, 0, 0.3)",
-    "rgba(192, 192, 192, 0.3)",
-    "rgba(205, 127, 50, 0.3)",
-];
-
-const buyerMedals = [
-    "/1st.png",
-    "/2nd.png",
-    "/3rd.png"
 ]
 
-const defaultGradient = "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)";
-const defaultBorder = "rgba(192, 192, 192, 0.3)";
+const buyerBorders = ["rgba(255, 215, 0, 0.3)", "rgba(192, 192, 192, 0.3)", "rgba(205, 127, 50, 0.3)"]
+
+const buyerMedals = ["/1st.png", "/2nd.png", "/3rd.png"]
+
+const defaultGradient = "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
+const defaultBorder = "rgba(192, 192, 192, 0.3)"
 
 export default function BuyerList({
     title = "Recent buyers",
     buyers,
     icon: Icon = FaCrown,
-    iconColor = '#FFFFFF',
-    showColors = true
+    iconColor = "#FFFFFF",
+    showColors = true,
 }) {
     return (
         <section className="w-full rounded-lg overflow-hidden" style={{ border: `0.5px solid ${defaultBorder}` }}>
@@ -37,63 +35,110 @@ export default function BuyerList({
                     <span
                         className="rounded-lg p-2 flex items-center justify-center"
                         style={{
-                            background: `${iconColor}26`
+                            background: `${iconColor}26`,
                         }}
                     >
-                        <Icon
-                            strokeWidth={2}
-                            className="bg-transparent rounded-full w-7 h-7"
-                            style={{ color: iconColor }}
-                        />
+                        <Icon strokeWidth={2} className="bg-transparent rounded-full w-7 h-7" style={{ color: iconColor }} />
                     </span>
                     {title}
                 </h2>
             </div>
-            <div className="grid grid-cols-5 gap-6 py-4 px-6">
-                {buyers.map((buyer, i) => (
-                    <div
-                        key={i}
-                        className={clsx(
-                            "rounded-xl flex flex-col items-start gap-3 px-4 py-3 min-w-[150px]"
-                        )}
-                        style={{
-                            background: showColors
-                                ? (buyerGradients[i] || defaultGradient)
-                                : defaultGradient,
-                            border: `0.5px solid ${showColors ? (buyerBorders[i] || defaultBorder) : defaultBorder}`,
+            <div className="py-4 px-6">
+                <div className="lg:hidden">
+                    <Swiper
+                        modules={[Autoplay, Pagination]}
+                        spaceBetween={16}
+                        slidesPerView={1}
+                        autoplay={{
+                            delay: 3000,
+                            disableOnInteraction: true,
+                            pauseOnMouseEnter: true,
                         }}
+                        pagination={{
+                            clickable: true,
+                        }}
+                        className="buyer-swiper"
                     >
-                        <div className="flex justify-between items-start w-full">
-                            <Image
-                                src={buyer.avatar}
-                                alt={buyer.name}
-                                width={64}
-                                height={64}
-                                className="rounded-md object-cover"
-                            />
+                        {buyers.map((buyer, i) => (
+                            <SwiperSlide key={i} className="!w-full">
+                                <div
+                                    className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
+                                    style={{
+                                        background: showColors ? buyerGradients[i] || defaultGradient : defaultGradient,
+                                        border: `0.5px solid ${showColors ? buyerBorders[i] || defaultBorder : defaultBorder}`,
+                                    }}
+                                >
+                                    <div className="flex justify-between items-start w-full">
+                                        <Image
+                                            src={buyer.avatar || "/placeholder.svg"}
+                                            alt={buyer.name}
+                                            width={64}
+                                            height={64}
+                                            className="rounded-md object-cover"
+                                        />
 
-                            {(i < 3 && showColors) &&
-                                <Image
-                                    className="mt-1"
-                                    src={buyerMedals[i]}
-                                    alt={buyer.name}
-                                    width={32}
-                                    height={51}
-                                />
-                            }
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <div className="font-semibold text-lg font-sans underline">{buyer.name}</div>
-                            <div className="text-light/60 font-sans text-sm">
-                                Bought: {buyer.bought}
+                                        {i < 3 && showColors && (
+                                            <Image
+                                                className="mt-1"
+                                                src={buyerMedals[i] || "/placeholder.svg"}
+                                                alt={buyer.name}
+                                                width={32}
+                                                height={51}
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <div className="font-semibold text-lg font-sans underline">{buyer.name}</div>
+                                        <div className="text-light/60 font-sans text-sm">Bought: {buyer.bought}</div>
+                                        <div className="text-light/60 font-sans text-sm">Position: {buyer.position}</div>
+                                    </div>
+                                </div>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </div>
+
+                <div className="hidden lg:block">
+                    <div className="grid grid-cols-5 gap-6">
+                        {buyers.map((buyer, i) => (
+                            <div
+                                key={i}
+                                className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3")}
+                                style={{
+                                    background: showColors ? buyerGradients[i] || defaultGradient : defaultGradient,
+                                    border: `0.5px solid ${showColors ? buyerBorders[i] || defaultBorder : defaultBorder}`,
+                                }}
+                            >
+                                <div className="flex justify-between items-start w-full">
+                                    <Image
+                                        src={buyer.avatar || "/placeholder.svg"}
+                                        alt={buyer.name}
+                                        width={64}
+                                        height={64}
+                                        className="rounded-md object-cover"
+                                    />
+
+                                    {i < 3 && showColors && (
+                                        <Image
+                                            className="mt-1"
+                                            src={buyerMedals[i] || "/placeholder.svg"}
+                                            alt={buyer.name}
+                                            width={32}
+                                            height={51}
+                                        />
+                                    )}
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <div className="font-semibold text-lg font-sans underline">{buyer.name}</div>
+                                    <div className="text-light/60 font-sans text-sm">Bought: {buyer.bought}</div>
+                                    <div className="text-light/60 font-sans text-sm">Position: {buyer.position}</div>
+                                </div>
                             </div>
-                            <div className="text-light/60 font-sans text-sm">
-                                Position: {buyer.position}
-                            </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>
         </section>
-    );
+    )
 }
+

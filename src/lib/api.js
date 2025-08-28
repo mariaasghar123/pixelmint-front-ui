@@ -21,7 +21,7 @@ api.interceptors.response.use(
             console.error(msg);
         } else if (error.request) {
             console.error("Network Error:", error.message);
-            toast.error("Network Error: " + error.message);
+            toast.error(error.message);
         } else {
             console.error("Config Error:", error.message);
             toast.error("Config Error: " + error.message);

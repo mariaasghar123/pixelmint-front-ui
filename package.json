@@ -25,6 +25,7 @@
     "react-hook-form": "^7.62.0",
     "react-icons": "^5.5.0",
     "react-toastify": "^11.0.5",
+    "swiper": "^11.2.10",
     "viem": "^2.34.0",
     "wagmi": "^2.16.4",
     "web3modal": "^1.9.12",

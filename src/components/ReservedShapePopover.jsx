@@ -25,7 +25,7 @@ export default function ReservedShapePopover({ coords, open, onContinue, onCance
             <div className="text-green-100 mb-2 text-xs text-center">You have a reservation for these pixels.</div>
             <div className="flex gap-2">
                 <Button className="" onClick={onContinue}>Continue</Button>
-                <Button className="!bg-error !hover:bg-error/20" onClick={handleClose}>Cancel</Button>
+                <Button className="!bg-error !hover:bg-error/20 !border-none" onClick={handleClose}>Cancel</Button>
             </div>
         </div>
     );

@@ -6,14 +6,22 @@ function formatCoords(coord) {
     return Math.floor(coord / 10)
 }
 
+function isValidReservation(pixelShape) {
+    const timeCreated = Number(pixelShape.reservationId.split("-")[0]);
+    const currentTime = Date.now();
+    const diffMinutes = (currentTime - timeCreated) / (1000 * 60);
+    return diffMinutes <= 10;
+}
 
 
 export function getReservation() {
     try {
         const raw = JSON.parse(localStorage.getItem("reservedPixels"));
         if (!(raw.topLeft && raw.bottomRight)) return null;
-        // const reservations = raw.filter(r => isValidReservation(r));
-        return raw
+        const isValid = isValidReservation(raw);
+        if (isValid)
+            return raw
+        return null
     } catch {
         return null;
     }
