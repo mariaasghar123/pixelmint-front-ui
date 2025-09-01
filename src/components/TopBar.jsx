@@ -62,7 +62,7 @@ function TopBar({
                                 ? `(${mousePixelPos.x}, ${mousePixelPos.y})`
                                 : "(–,–)"}
                         </span>
-                        <span className="whitespace-nowrap">Block: 10x10 Pixels($10)</span>
+                        <span className="whitespace-nowrap">Block: 5x5 Pixels($2.5)</span>
                     </div>
 
                     <div className="flex items-center gap-2 lg:gap-3 flex-wrap lg:flex-nowrap">

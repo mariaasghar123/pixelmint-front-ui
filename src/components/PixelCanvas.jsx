@@ -20,11 +20,11 @@ const BorderWidth = 2
 const shopverseImg = "/shopverse.png"
 const TOTAL_WIDTH = 1250
 const TOTAL_HEIGHT = 750
-const BLOCK_SIZE = 10
+const BLOCK_SIZE = 5
 const GRID_WIDTH = TOTAL_WIDTH / BLOCK_SIZE
 const GRID_HEIGHT = TOTAL_HEIGHT / BLOCK_SIZE
-const PIXEL_CANVAS_WIDTH = GRID_WIDTH * BLOCK_SIZE // 1250
-const PIXEL_CANVAS_HEIGHT = GRID_HEIGHT * BLOCK_SIZE // 750
+const PIXEL_CANVAS_WIDTH = GRID_WIDTH * BLOCK_SIZE
+const PIXEL_CANVAS_HEIGHT = GRID_HEIGHT * BLOCK_SIZE
 const ZOOM_LEVEL = 3
 
 function formatCoordsArr(coordArr) {
@@ -453,6 +453,7 @@ export default function PixelGridCanvas() {
                 (blockCoords.bottomRight[0] + 1) * BLOCK_SIZE,
                 (blockCoords.bottomRight[1] + 1) * BLOCK_SIZE,
             ]
+
             const coords = {
                 topLeft: pxTopLeft,
                 bottomRight: pxBottomRight,
