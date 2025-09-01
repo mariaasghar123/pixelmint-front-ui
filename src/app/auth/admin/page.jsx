@@ -1,36 +1,18 @@
 "use client"
 import { useState } from "react"
-import { Mail, Shield, Wallet, Zap } from "lucide-react"
+import { Shield } from "lucide-react"
 import Image from "next/image"
 import Button from "@/components/ui/Button"
-import { useMutation } from "@tanstack/react-query"
 import { toast } from "react-toastify"
-import { useRouter } from "next/navigation"
-import api from "@/lib/api"
+import { useAuth } from "@/components/AuthProvider"
 
 export default function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const router = useRouter()
-
-    const loginMutation = useMutation({
-        mutationFn: async (credentials) => {
-            const response = await api.post('/auth/admin/login', credentials)
-            return response.data
-        },
-        onSuccess: (data) => {
-            toast.success(data.message || "Login successful!")
-            // Redirect to dashboard or admin panel
-            setTimeout(() => {
-                router.push("/admin") // or wherever you want to redirect
-            }, 1500)
-        },
-        onError: (error) => {
-            const errorMessage = error.response?.data?.message || "Login failed. Please try again."
-            toast.error(errorMessage)
-            console.error("Login failed:", error)
-        }
-    })
+    const [isLoading, setIsLoading] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false)
+    
+    const { adminLogin } = useAuth()
 
     const handleLogin = async (e) => {
         e.preventDefault()
@@ -40,7 +22,15 @@ export default function Login() {
             return
         }
 
-        loginMutation.mutate({ email, password })
+        setIsLoading(true)
+        
+        const result = await adminLogin({ email, password })
+        
+        if (result.success) {
+            setIsSuccess(true)
+        }
+        
+        setIsLoading(false)
     }
 
     return (
@@ -61,7 +51,7 @@ export default function Login() {
 
                 <p className="mt-2 text-base text-[#A9D7B8] text-center">Enter your credentials to continue.</p>
 
-                {!loginMutation.isSuccess && (
+                {!isSuccess && (
                     <form onSubmit={handleLogin} className="mt-8 w-full space-y-4">
                         <div>
                             <input
@@ -70,7 +60,7 @@ export default function Login() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                disabled={loginMutation.isPending}
+                                disabled={isLoading}
                                 className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-dark-100 placeholder-dark-400 focus:outline-none focus:border-[#65E78C] focus:ring-1 focus:ring-[#65E78C] disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
@@ -81,7 +71,7 @@ export default function Login() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                disabled={loginMutation.isPending}
+                                disabled={isLoading}
                                 className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-dark-100 placeholder-dark-400 focus:outline-none focus:border-[#65E78C] focus:ring-1 focus:ring-[#65E78C] disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
@@ -93,24 +83,17 @@ export default function Login() {
                                 background: "linear-gradient(90deg,#65E78C 0%, #A9D7B8 100%)",
                                 color: "#05281B",
                             }}
-                            disabled={loginMutation.isPending}
+                            disabled={isLoading}
                         >
-                            {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                            {isLoading ? "Signing in..." : "Sign In"}
                         </Button>
                     </form>
                 )}
 
                 {/* Success message */}
-                {loginMutation.isSuccess && (
+                {isSuccess && (
                     <div className="mt-8 text-green-100 text-center font-bold text-lg">
                         Login successful! Redirecting...
-                    </div>
-                )}
-
-                {/* Error message (optional, since we're using toast) */}
-                {loginMutation.isError && (
-                    <div className="mt-4 text-red-400 text-center text-sm">
-                        {loginMutation.error?.response?.data?.message || "Login failed. Please try again."}
                     </div>
                 )}
 

@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }) => {
         staleTime: 2700000
     });
 
+    // Wallet authentication
     const authenticate = async () => {
         if (!address) {
             toast.error("Wallet address required for authentication.");
@@ -65,11 +66,49 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Step: Logout
+    // Admin login with email/password
+    const adminLogin = async (credentials) => {
+        try {
+            const response = await api.post('/auth/admin/login', credentials);
+
+            if (response.data.success) {
+                toast.success(response.data.message || "Admin login successful!");
+
+                // Refetch user data to update context
+                await refetchStatus();
+                queryClient.invalidateQueries(["auth-status"]);
+
+                // Redirect to admin panel
+                router.push("/admin");
+                return { success: true, data: response.data };
+            } else {
+                throw new Error(response.data.message || "Login failed");
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || "Login failed. Please try again.";
+            toast.error(errorMessage);
+            console.error("Admin login failed:", error);
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    // Logout (works for both wallet and admin)
     const logout = async () => {
         try {
-            await api.post("/auth/disconnect", {});
-            disconnect();
+            // For admin logout, use admin/logout endpoint
+            if (userData?.user?.role === 'admin' && userData?.user?.email) {
+                await api.post("/auth/admin/logout", {});
+            } else {
+                // For wallet logout, use disconnect endpoint
+                await api.post("/auth/disconnect", {});
+            }
+
+            // Disconnect wallet if connected
+            if (isConnected) {
+                disconnect();
+            }
+
+            // Clear user data
             refetchStatus();
             queryClient.setQueryData(['auth-status'], null);
             toast.success("Logged out!");
@@ -86,6 +125,7 @@ export const AuthProvider = ({ children }) => {
             address,
             isConnected,
             authenticate,
+            adminLogin, // Add admin login function
             logout,
             connectLoading,
             signLoading,
