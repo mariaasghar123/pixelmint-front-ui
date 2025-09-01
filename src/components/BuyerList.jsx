@@ -69,7 +69,7 @@ export default function BuyerList({
                         }}
                         className="buyer-swiper"
                     >
-                        {buyers.map((buyer, i) => (
+                        {buyers?.map((buyer, i) => (
                             <SwiperSlide key={i} className="!w-full">
                                 <div
                                     className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
@@ -80,8 +80,8 @@ export default function BuyerList({
                                 >
                                     <div className="flex justify-between items-start w-full">
                                         <Image
-                                            src={buyer.avatar || "/placeholder.svg"}
-                                            alt={buyer.name}
+                                            src={buyer.avatar || "/shopverse.png"}
+                                            alt={buyer.adTitle}
                                             width={64}
                                             height={64}
                                             className="rounded-md object-cover"
@@ -90,17 +90,19 @@ export default function BuyerList({
                                         {showColors && (
                                             <Image
                                                 className="mt-1"
-                                                src={buyerMedals[i] || "/placeholder.svg"}
-                                                alt={buyer.name}
+                                                src={buyerMedals[i] || "/shopverse.png"}
+                                                alt={buyer.displayName}
                                                 width={32}
                                                 height={51}
                                             />
                                         )}
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <div className="font-semibold text-lg font-sans underline">{buyer.name}</div>
-                                        <div className="text-light/60 font-sans text-sm">Bought: {buyer.bought}</div>
-                                        <div className="text-light/60 font-sans text-sm">Position: {buyer.position}</div>
+                                        <div className="font-semibold text-lg font-sans underline">{buyer.displayName || 'Shopverse'}</div>
+                                        <div className="text-light/60 font-sans text-sm">Bought: {buyer.purchaseArea || '404'}</div>
+                                        <div className="text-light/60 font-sans text-sm">
+                                            Position: {`((${buyer?.purchasePosition?.topLeft || '--,--'}), (${buyer?.purchasePosition?.bottomRight || '--,--'}))`}
+                                        </div>
                                     </div>
                                 </div>
                             </SwiperSlide>
@@ -110,7 +112,7 @@ export default function BuyerList({
 
                 <div className="hidden lg:block">
                     <div className="grid grid-cols-5 gap-6">
-                        {buyers.map((buyer, i) => (
+                        {buyers?.map((buyer, i) => (
                             <div
                                 key={i}
                                 className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3")}
@@ -121,8 +123,8 @@ export default function BuyerList({
                             >
                                 <div className="flex justify-between items-start w-full">
                                     <Image
-                                        src={buyer.avatar || "/placeholder.svg"}
-                                        alt={buyer.name}
+                                        src={buyer.avatar || "/shopverse.png"}
+                                        alt={buyer.adTitle}
                                         width={64}
                                         height={64}
                                         className="rounded-md object-cover"
@@ -131,17 +133,19 @@ export default function BuyerList({
                                     {showColors && (
                                         <Image
                                             className="mt-1"
-                                            src={buyerMedals[i] || "/placeholder.svg"}
-                                            alt={buyer.name}
+                                            src={buyerMedals[i] || "/shopverse.png"}
+                                            alt={buyer.displayName}
                                             width={32}
                                             height={51}
                                         />
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <div className="font-semibold text-lg font-sans underline">{buyer.name}</div>
-                                    <div className="text-light/60 font-sans text-sm">Bought: {buyer.bought}</div>
-                                    <div className="text-light/60 font-sans text-sm">Position: {buyer.position}</div>
+                                    <div className="font-semibold text-lg font-sans underline">{buyer?.displayName || 'User'}</div>
+                                    <div className="text-light/60 font-sans text-sm">Bought: {buyer?.purchaseArea || 0}</div>
+                                    <div className="text-light/60 font-sans text-sm">
+                                        Position: {`((${buyer?.purchasePosition?.topLeft || '--,--'}), (${buyer?.purchasePosition?.bottomRight || '--,--'}))`}
+                                    </div>
                                 </div>
                             </div>
                         ))}

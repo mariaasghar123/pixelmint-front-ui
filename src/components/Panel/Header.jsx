@@ -6,12 +6,12 @@ const headerPropsByPath = {
     "/user": {
         title: "Buy Pixels",
         subtitle: "Purchase pixels to display your ad",
-        btnText: "Buy Pixels",
+        btnText: null,
     },
     "/user/ads": {
         title: "Buy Pixels",
         subtitle: "Purchase pixels to display your ad",
-        btnText: "Add Ads",
+        btnText: null,
     },
     "/user/query": {
         title: "Query",

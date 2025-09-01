@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }) => {
                 nonce,
                 signature,
             });
+            console.log(loginRes)
             if (loginRes.data.success) {
                 toast.success("Logged in!");
                 refetchStatus();
