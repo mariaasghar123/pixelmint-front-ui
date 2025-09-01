@@ -35,8 +35,13 @@ export default function CompleteTransactionModal({ open, onClose }) {
 
     const createPurchase = useMutation({
         mutationFn: purchasePixelMutation,
-        onSuccess: (_data) => {
-            toast.success('Pixel purchase successful!');
+        onSuccess: (data) => {
+            if (data?.success === true) {
+                toast.success('Pixel purchase successful!');
+                handleClose();
+            } else {
+                toast.error(data?.message || 'Pixel purchase failed!');
+            }
         },
         onError: (error) => {
             toast.error(error.message || 'Pixel purchase failed!');
@@ -45,13 +50,12 @@ export default function CompleteTransactionModal({ open, onClose }) {
 
     function handleClose() {
         reset()
-        // clearReservation();
+        clearReservation();
         onClose();
     }
 
     function onFormSubmit(data) {
         createPurchase.mutate({ ...data, pixelArea: reservation })
-        // handleClose();
     }
 
     if (!open) return null;

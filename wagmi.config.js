@@ -1,5 +1,5 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { metaMask } from 'wagmi/connectors'
+import { metaMask, walletConnect } from 'wagmi/connectors'
 import { mainnet, sepolia } from 'wagmi/chains'
 import { createConfig, http } from 'wagmi'
 
@@ -13,7 +13,13 @@ if (!PROJECT_ID) {
 export const networks = [mainnet, sepolia]
 
 const wagmiConfig = createConfig({
-    connectors: [metaMask()],
+    connectors: [
+        metaMask(),
+        walletConnect({
+            projectId: PROJECT_ID,
+            chains: [mainnet, sepolia]
+        })
+    ],
     chains: networks,
     transports: {
         [mainnet.id]: http(`https://mainnet.infura.io/v3/${INFURA_KEY}`),

@@ -32,7 +32,7 @@ function formatCoordsArr(coordArr) {
 }
 
 function blockToPixelCoords(blockArr) {
-    return [blockArr[0] * BLOCK_SIZE, blockArr[1] * BLOCK_SIZE]
+    return [blockArr[0] * BLOCK_SIZE + 1, blockArr[1] * BLOCK_SIZE + 1]
 }
 
 const propShapes = [
@@ -103,7 +103,6 @@ export default function PixelGridCanvas() {
     const [zoom, setZoom] = useState(1)
     const [canDraw, setCanDraw] = useState(false)
     const [loadedImages, setLoadedImages] = useState({})
-    // Remove scale from canvasPxSize, only keep for transforms
     const [canvasScale, setCanvasScale] = useState(1)
     const [showReserveModal, setShowReserveModal] = useState(false)
     const [showCompleteModal, setShowCompleteModal] = useState(false)
@@ -451,8 +450,8 @@ export default function PixelGridCanvas() {
 
             const pxTopLeft = blockToPixelCoords(blockCoords.topLeft)
             const pxBottomRight = [
-                (blockCoords.bottomRight[0] + 1) * BLOCK_SIZE - 1,
-                (blockCoords.bottomRight[1] + 1) * BLOCK_SIZE - 1,
+                (blockCoords.bottomRight[0] + 1) * BLOCK_SIZE,
+                (blockCoords.bottomRight[1] + 1) * BLOCK_SIZE,
             ]
             const coords = {
                 topLeft: pxTopLeft,

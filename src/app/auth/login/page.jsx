@@ -6,10 +6,12 @@ import { toast } from "react-toastify";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/components/AuthProvider";
 import { useAppKit } from "@reown/appkit/react";
+import { useConnect } from "wagmi";
 
 export default function Login() {
     const { open } = useAppKit();
     const [loading, setLoading] = useState(false);
+    const { isConnected } = useConnect()
     const [step, setStep] = useState("idle");
     const { authenticate } = useAuth();
 
@@ -17,7 +19,8 @@ export default function Login() {
         setLoading(true);
         setStep("connecting");
         try {
-            open();
+            if (!isConnected)
+                open();
             setStep("connected");
         } catch (e) {
             toast.error(e.message || "Failed to connect wallet");

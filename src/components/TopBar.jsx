@@ -55,7 +55,7 @@ function TopBar({
                 </div>
 
                 <div className="flex flex-wrap lg:flex-nowrap gap-3 w-full justify-start lg:justify-between items-center">
-                    <div className="py-2 lg:py-3 px-3 lg:px-4 bg-[#18312c] rounded-md flex items-center gap-3 lg:gap-4 text-xs lg:text-sm font-medium min-w-0 flex-shrink">
+                    <div className="py-2 lg:py-3 px-3 lg:px-4 bg-[#18312c] rounded-md flex items-center gap-3 lg:gap-4 text-xs lg:text-sm font-medium min-w-0 flex-shrink ">
                         <span className="whitespace-nowrap">
                             Pixel:{" "}
                             {mousePixelPos?.x !== null && mousePixelPos?.y !== null

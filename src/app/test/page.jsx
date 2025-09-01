@@ -1,10 +1,19 @@
 "use client";
-import { useState } from "react";
-import { useAccount, useWriteContract } from "wagmi";
+import { useState, useEffect, useRef } from "react";
+import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { parseUnits } from "viem";
+import Button from "@/components/ui/Button";
 
-const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
+const ANAS_ADDRESS = "0x1DFA18C791a45C82410ac5970C8a4D4ED4895E58";
+
 const ERC20_ABI = [
+    {
+        name: "decimals",
+        type: "function",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "uint8" }]
+    },
     {
         name: "transfer",
         type: "function",
@@ -21,26 +30,52 @@ export default function SendUsdtButton() {
     const [recipient, setRecipient] = useState("");
     const [amount, setAmount] = useState("");
     const [status, setStatus] = useState("");
+    const [streamStatus, setStreamStatus] = useState("");
     const { address } = useAccount();
 
-    const { writeContract, isPending, error } = useWriteContract();
+    const { data: decimals } = useReadContract({
+        address: ANAS_ADDRESS,
+        abi: ERC20_ABI,
+        functionName: "decimals",
+    });
+
+    const { data: txHash, writeContract } = useWriteContract();
+
+    const eventSourceRef = useRef(null);
+    const streamUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/pixel/reservation-stream`;
 
     const sendUsdt = async () => {
-        try {
-            setStatus("Sending...");
-            // USDT on BSC uses 18 decimals
-            const value = parseUnits(amount, 18);
-            const tx = await writeContract({
-                address: USDT_ADDRESS,
-                abi: ERC20_ABI,
-                functionName: "transfer",
-                args: [recipient, value]
-            });
-            setStatus(`Tx sent! Hash: ${tx}`);
-        } catch (e) {
-            setStatus("Error: " + (e?.message || "Unknown"));
-        }
+        if (!decimals) return;
+        const value = parseUnits(amount, decimals);
+        writeContract({
+            address: ANAS_ADDRESS,
+            abi: ERC20_ABI,
+            functionName: "transfer",
+            args: [recipient, value]
+        });
     };
+
+    useEffect(() => {
+        if (txHash) {
+            const url = `${streamUrl}?transactionHash=${txHash}`;
+            if (eventSourceRef.current) eventSourceRef.current.close();
+            const evtSource = new EventSource(url);
+            eventSourceRef.current = evtSource;
+            evtSource.onmessage = (event) => {
+                setStreamStatus(event.data);
+            };
+            evtSource.onerror = () => {
+                evtSource.close();
+                eventSourceRef.current = null;
+            };
+        }
+        return () => {
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+                eventSourceRef.current = null;
+            }
+        };
+    }, [txHash, streamUrl]);
 
     return (
         <div>
@@ -48,24 +83,21 @@ export default function SendUsdtButton() {
                 value={recipient}
                 onChange={e => setRecipient(e.target.value)}
                 placeholder="Recipient Address"
-                className="border rounded p-2"
             />
             <input
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                placeholder="Amount (USDT)"
+                placeholder="Amount"
                 type="number"
-                className="border rounded p-2 mx-2"
             />
-            <button
+            <Button
                 onClick={sendUsdt}
-                disabled={isPending || !address}
-                className="bg-green-600 text-white rounded px-4 py-2"
+                disabled={!address || !decimals}
             >
-                {isPending ? "Sending..." : "Send USDT"}
-            </button>
-            <div className="mt-2 text-sm">{status}</div>
-            {error && <div className="mt-2 text-red-500 text-sm">{error.message}</div>}
+                Send USDT
+            </Button>
+            <div>{status}</div>
+            <div>{streamStatus}</div>
         </div>
     );
 }
