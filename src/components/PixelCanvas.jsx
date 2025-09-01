@@ -26,25 +26,24 @@ const GRID_HEIGHT = TOTAL_HEIGHT / BLOCK_SIZE
 const PIXEL_CANVAS_WIDTH = GRID_WIDTH * BLOCK_SIZE
 const PIXEL_CANVAS_HEIGHT = GRID_HEIGHT * BLOCK_SIZE
 const MIN_ZOOM = 0.1
-const MAX_ZOOM = 20 // Increased for high precision zoom
+const MAX_ZOOM = 20
 const ZOOM_FACTOR = 0.1
 
 // Magnifying glass settings
-const MAGNIFIER_SIZE = 200 // Diameter of magnifier
-const MAGNIFIER_ZOOM = 8 // Initial magnification level
+const MAGNIFIER_SIZE = 200
+const MAGNIFIER_ZOOM = 8
 const MIN_MAGNIFIER_ZOOM = 2
 const MAX_MAGNIFIER_ZOOM = 20
 
 // Click-to-zoom settings
-const CLICK_ZOOM_LEVELS = [5, 10, 15, 20] // High precision zoom levels
-const CLICK_ZOOM_FACTOR = 0.8 // How much of the screen should the zoomed area occupy
+const CLICK_ZOOM_LEVELS = [5, 10, 15, 20]
 
 function formatCoordsArr(coordArr) {
     return [Math.floor(coordArr[0] / BLOCK_SIZE), Math.floor(coordArr[1] / BLOCK_SIZE)]
 }
 
 function blockToPixelCoords(blockArr) {
-    return [blockArr[0] * BLOCK_SIZE + 1, blockArr[1] * BLOCK_SIZE + 1]
+    return [blockArr[0] * BLOCK_SIZE, blockArr[1] * BLOCK_SIZE]
 }
 
 const propShapes = [
@@ -106,7 +105,7 @@ function isMobileDevice() {
 
 export default function PixelGridCanvas() {
     const canvasRef = useRef(null)
-    const magnifierCanvasRef = useRef(null) // Hidden canvas for magnifier source
+    const magnifierCanvasRef = useRef(null)
     const canvasContainerRef = useRef(null)
     const router = useRouter()
     const [panning, setPanning] = useState(false)
@@ -133,7 +132,7 @@ export default function PixelGridCanvas() {
     const [magnifierPos, setMagnifierPos] = useState({ x: 0, y: 0 })
     const [magnifierZoom, setMagnifierZoom] = useState(MAGNIFIER_ZOOM)
     const [isMobile, setIsMobile] = useState(false)
-    const [clickZoomLevel, setClickZoomLevel] = useState(0) // Track current click zoom level
+    const [clickZoomLevel, setClickZoomLevel] = useState(0)
 
     const [activeReservation, setActiveReservation] = useState(() => {
         const reservations = getReservation()
@@ -227,18 +226,17 @@ export default function PixelGridCanvas() {
         fetchReservations()
     }, [])
 
-    // Responsive scaling (only affects CSS size, not canvas pixel size)
+    // Responsive scaling
     useEffect(() => {
         function handleResize() {
             const parent = canvasRef.current?.parentNode
             if (parent) {
                 const maxWidth = Math.min(parent.offsetWidth, window.innerWidth)
-                const maxHeight = window.innerHeight - 120 // Account for TopBar and some padding
+                const maxHeight = window.innerHeight - 120
 
-                // Calculate scale based on both width and height constraints
                 const scaleByWidth = maxWidth / PIXEL_CANVAS_WIDTH
                 const scaleByHeight = maxHeight / PIXEL_CANVAS_HEIGHT
-                const scale = Math.min(scaleByWidth, scaleByHeight, 1) // Don't scale up beyond original size
+                const scale = Math.min(scaleByWidth, scaleByHeight, 1)
 
                 setCanvasScale(scale)
             }
@@ -287,7 +285,8 @@ export default function PixelGridCanvas() {
         }
         ctx.stroke()
 
-        if (purchases)
+        // Draw purchases
+        if (purchases) {
             for (const rect of purchases) {
                 if (canDraw) {
                     drawRectOnGrid(
@@ -315,7 +314,16 @@ export default function PixelGridCanvas() {
                     )
                 }
             }
+        }
 
+        // Draw propShapes (static shapes)
+        if (canDraw) {
+            for (const rect of propShapes) {
+                drawRectOnGrid(ctx, rect.topLeft, rect.bottomRight, BLOCK_SIZE, COLOR_PROP_SHAPE)
+            }
+        }
+
+        // Draw reservations (excluding active reservation)
         if (canDraw) {
             allReservations.forEach((reservation) => {
                 if (reservation.reservationId == activeReservationId) return
@@ -326,16 +334,18 @@ export default function PixelGridCanvas() {
             })
         }
 
+        // Draw active reservation
         if (activeReservation) {
-            // block coordinates for drawing
             const start = formatCoordsArr(activeReservation.topLeft)
             const end = formatCoordsArr(activeReservation.bottomRight)
             drawRectOnGrid(ctx, start, end, BLOCK_SIZE, COLOR_DRAW_PREVIEW)
         }
 
+        // Draw current drawing selection
         if (drawing && startBlock && endBlock) {
             drawRectOnGrid(ctx, startBlock, endBlock, BLOCK_SIZE, COLOR_DRAW_PREVIEW)
         }
+
         ctx.restore()
 
         // Draw magnifier if active
@@ -398,7 +408,7 @@ export default function PixelGridCanvas() {
         }
         tempCtx.stroke()
 
-        // Draw content
+        // Draw content (same logic as main canvas)
         if (purchases) {
             for (const rect of purchases) {
                 if (canDraw) {
@@ -426,6 +436,13 @@ export default function PixelGridCanvas() {
                         isAuthenticated?.user?.userId === rect.userId ? COLOR_DRAW_PREVIEW : COLOR_PROP_SHAPE,
                     )
                 }
+            }
+        }
+
+        // Draw propShapes
+        if (canDraw) {
+            for (const rect of propShapes) {
+                drawRectOnGrid(tempCtx, rect.topLeft, rect.bottomRight, BLOCK_SIZE, COLOR_PROP_SHAPE)
             }
         }
 
@@ -708,7 +725,7 @@ export default function PixelGridCanvas() {
         }
     }
 
-    // Touch event handlers (unchanged for mobile)
+    // Touch event handlers
     function handleTouchStart(e) {
         e.preventDefault();
 
@@ -830,7 +847,10 @@ export default function PixelGridCanvas() {
                     return;
                 }
 
-                if (rectOverlaps(blockCoords, allReservations) || rectOverlaps(blockCoords, purchases)) {
+                // Check overlap with all reservations, purchases, AND propShapes
+                if (rectOverlaps(blockCoords, allReservations) ||
+                    rectOverlaps(blockCoords, purchases ? purchases.map(p => ({ pixelArea: p.pixelArea })) : []) ||
+                    rectOverlaps(blockCoords, propShapes)) {
                     toast.error("Cannot reserve overlapping pixels. Please select a free area.");
                     setDrawing(false);
                     setTouchDrawing(false);
@@ -974,7 +994,10 @@ export default function PixelGridCanvas() {
                 return
             }
 
-            if (rectOverlaps(blockCoords, allReservations) || rectOverlaps(blockCoords, purchases)) {
+            // Check overlap with all reservations, purchases, AND propShapes
+            if (rectOverlaps(blockCoords, allReservations) ||
+                rectOverlaps(blockCoords, purchases ? purchases.map(p => ({ pixelArea: p.pixelArea })) : []) ||
+                rectOverlaps(blockCoords, propShapes)) {
                 toast.error("Cannot reserve overlapping pixels. Please select a free area.")
                 setDrawing(false)
                 setStartBlock(null)
@@ -1005,7 +1028,7 @@ export default function PixelGridCanvas() {
     function handleResetZoom() {
         setZoom(1)
         setOffset({ x: 0, y: 0 })
-        setClickZoomLevel(0) // Reset click zoom level
+        setClickZoomLevel(0)
     }
 
     function handleCanDrawToggle() {
@@ -1069,7 +1092,7 @@ export default function PixelGridCanvas() {
     // Determine cursor style
     function getCursorStyle() {
         if (panning) return "grab"
-        if (magnifierActive && !isMobile) return "none" // Hide cursor when magnifier is active
+        if (magnifierActive && !isMobile) return "none"
         if (drawing && canDraw) return "crosshair"
         return "pointer"
     }
@@ -1159,8 +1182,8 @@ function drawImageOnGrid(ctx, topLeft, bottomRight, blockSize, img) {
     const y1 = Math.min(topLeft[1], bottomRight[1])
     const x2 = Math.max(topLeft[0], bottomRight[0])
     const y2 = Math.max(topLeft[1], bottomRight[1])
-    const width = (x2 - x1) * blockSize
-    const height = (y2 - y1) * blockSize
+    const width = (x2 - x1 + 1) * blockSize
+    const height = (y2 - y1 + 1) * blockSize
     ctx.drawImage(img, x1 * blockSize, y1 * blockSize, width, height)
 }
 
@@ -1171,8 +1194,8 @@ function drawRectOnGrid(ctx, topLeft, bottomRight, blockSize, color) {
     const y2 = Math.max(topLeft[1], bottomRight[1])
     const px = x1 * blockSize
     const py = y1 * blockSize
-    const width = (x2 - x1) * blockSize
-    const height = (y2 - y1) * blockSize
+    const width = (x2 - x1 + 1) * blockSize
+    const height = (y2 - y1 + 1) * blockSize
 
     ctx.fillStyle = `${color}33`
     ctx.fillRect(px, py, width, height)

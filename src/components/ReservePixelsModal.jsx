@@ -22,8 +22,8 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
             return { area: 0, price: 0, width: 0, height: 0 }
         }
 
-        const width = coords.bottomRight[0] - coords.topLeft[0] + 1
-        const height = coords.bottomRight[1] - coords.topLeft[1] + 1
+        const width = coords.bottomRight[0] - coords.topLeft[0]
+        const height = coords.bottomRight[1] - coords.topLeft[1]
         const area = width * height
         const price = (area / 100) * 10
 
@@ -40,7 +40,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                     <div className="flex justify-between">
                         <span className="text-green-100">Dimensions:</span>
                         <span className="text-green-200 font-mono">
-                            {width} × {height}x
+                            {width} × {height}px
                         </span>
                     </div>
                     <div className="flex justify-between">

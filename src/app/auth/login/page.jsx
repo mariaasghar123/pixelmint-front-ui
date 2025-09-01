@@ -53,7 +53,7 @@ export default function Login() {
                 />
             </div>
 
-            <div className="min-w-[380px] bg-transparent rounded-xl border-2 border-[rgba(101,231,140,0.25)] flex flex-col items-center py-8 px-12 shadow-lg">
+            <div className="w-[90%] md:w-full max-w-[500px] bg-transparent rounded-xl border-2 border-[rgba(101,231,140,0.25)] flex flex-col items-center py-8 px-12 shadow-lg">
                 <div className="bg-dark-400 rounded-full flex items-center justify-center mb-2" style={{ width: 56, height: 56 }}>
                     <Wallet size={32} fill="#98F08C" strokeWidth={0} />
                 </div>
