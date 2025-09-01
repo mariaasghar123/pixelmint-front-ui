@@ -2,11 +2,18 @@
 
 import Image from "next/image"
 import clsx from "clsx"
-import { FaCrown } from "react-icons/fa"
+import { FaCrown, FaClock, FaUsers } from "react-icons/fa"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Autoplay, Pagination } from "swiper/modules"
+
 import "swiper/css"
 import "swiper/css/pagination"
+
+const iconMap = {
+    FaCrown,
+    FaUsers,
+    FaClock,
+}
 
 const buyerGradients = [
     "linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.2) 6%, rgba(255, 215, 0, 0.05) 100%)", // Gold
@@ -16,7 +23,7 @@ const buyerGradients = [
 
 const buyerBorders = ["rgba(255, 215, 0, 0.3)", "rgba(192, 192, 192, 0.3)", "rgba(205, 127, 50, 0.3)"]
 
-const buyerMedals = ["/1st.png", "/2nd.png", "/3rd.png"]
+const buyerMedals = ["/1st.png", "/2nd.png", "/3rd.png", "/4th.png", "/4th.png"]
 
 const defaultGradient = "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
 const defaultBorder = "rgba(192, 192, 192, 0.3)"
@@ -24,10 +31,13 @@ const defaultBorder = "rgba(192, 192, 192, 0.3)"
 export default function BuyerList({
     title = "Recent buyers",
     buyers,
-    icon: Icon = FaCrown,
+    icon = "FaCrown",
     iconColor = "#FFFFFF",
     showColors = true,
 }) {
+
+    const Icon = iconMap[icon] || FaCrown
+
     return (
         <section className="w-full rounded-lg overflow-hidden" style={{ border: `0.5px solid ${defaultBorder}` }}>
             <div className="bg-dark-800 p-4 flex items-center gap-2">
@@ -77,7 +87,7 @@ export default function BuyerList({
                                             className="rounded-md object-cover"
                                         />
 
-                                        {i < 3 && showColors && (
+                                        {showColors && (
                                             <Image
                                                 className="mt-1"
                                                 src={buyerMedals[i] || "/placeholder.svg"}
@@ -118,7 +128,7 @@ export default function BuyerList({
                                         className="rounded-md object-cover"
                                     />
 
-                                    {i < 3 && showColors && (
+                                    {showColors && (
                                         <Image
                                             className="mt-1"
                                             src={buyerMedals[i] || "/placeholder.svg"}

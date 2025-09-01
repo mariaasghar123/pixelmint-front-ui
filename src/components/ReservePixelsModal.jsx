@@ -32,15 +32,6 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
 
     const { area, price, width, height } = calculateAreaAndPrice()
 
-    function CoordCard({ label, value }) {
-        return (
-            <div className="flex flex-col items-center bg-dark-700 rounded-lg px-6 py-3 shadow-md border border-border min-w-[180px]">
-                <span className="text-green-100 text-base font-semibold mb-2">{label}</span>
-                <span className="text-green-200 text-2xl font-mono font-bold tracking-wide">{value}</span>
-            </div>
-        )
-    }
-
     function AreaPriceCard() {
         return (
             <div className="bg-dark-700 rounded-lg px-6 py-4 shadow-md border border-border w-full max-w-md">
@@ -49,7 +40,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                     <div className="flex justify-between">
                         <span className="text-green-100">Dimensions:</span>
                         <span className="text-green-200 font-mono">
-                            {width} × {height}px
+                            {width} × {height}x
                         </span>
                     </div>
                     <div className="flex justify-between">
@@ -86,27 +77,17 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
 
     return open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-dark-800 rounded-2xl px-12 py-8 min-w-[380px] shadow-2xl border border-border flex flex-col items-center">
-                <div className="text-4xl font-semibold mb-3 text-green-200 font-ari tracking-tight">Pixels Reserved!</div>
-                <div className="text-green-100 mb-3 text-lg ">Please confirm your reservation of the selected pixels.</div>
-                {/* <div className="flex gap-8 mb-6 items-stretch"> */}
-                {/*     <CoordCard */}
-                {/*         label="Top Left (px)" */}
-                {/*         value={coords?.topLeft ? `${coords.topLeft[0]}, ${coords.topLeft[1]}` : "--"} */}
-                {/*     /> */}
-                {/*     <CoordCard */}
-                {/*         label="Bottom Right (px)" */}
-                {/*         value={coords?.bottomRight ? `${coords.bottomRight[0]}, ${coords.bottomRight[1]}` : "--"} */}
-                {/*     /> */}
-                {/* </div> */}
+            <div className="bg-dark-800 rounded-2xl px-6 md:px-12 py-8 w-[90%] md:w-full max-w-[550px] shadow-2xl border border-border flex flex-col items-center">
+                <div className="text-2xl md:text-4xl font-semibold mb-3 text-green-200 font-ari tracking-tight">Pixels Reserved!</div>
+                <div className="text-green-100 mb-3 text-center text-sm md:text-lg">Please confirm your reservation of the selected pixels.</div>
                 <div className="mb-8 w-full flex justify-center">
                     <AreaPriceCard />
                 </div>
                 <div className="flex gap-4 w-full justify-center">
-                    <Button onClick={handleConfirm} disabled={loading}>
+                    <Button onClick={handleConfirm} disabled={loading} className="text-xs md:text-base">
                         {loading ? "Confirming..." : "Confirm Reservation"}
                     </Button>
-                    <Button onClick={handleClose} className="!bg-error !hover:bg-error/20 !border-none" disabled={loading}>
+                    <Button onClick={handleClose} className="!bg-error !hover:bg-error/20 !border-none text-xs md:text-base" disabled={loading}>
                         Cancel
                     </Button>
                 </div>

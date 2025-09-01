@@ -62,7 +62,7 @@ export default function CompleteTransactionModal({ open, onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-dark-700 rounded-2xl px-12 py-8 max-w-[500px] w-full shadow-2xl border border-green-400 flex flex-col items-start relative">
+            <div className="bg-dark-700 rounded-2xl px-8 md:px-12 py-8 max-w-[500px] w-[90%] md:w-full shadow-2xl border border-green-400 flex flex-col items-start relative">
                 <button
                     type="button"
                     aria-label="Close"

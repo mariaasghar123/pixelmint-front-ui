@@ -25,7 +25,9 @@ const GRID_WIDTH = TOTAL_WIDTH / BLOCK_SIZE
 const GRID_HEIGHT = TOTAL_HEIGHT / BLOCK_SIZE
 const PIXEL_CANVAS_WIDTH = GRID_WIDTH * BLOCK_SIZE
 const PIXEL_CANVAS_HEIGHT = GRID_HEIGHT * BLOCK_SIZE
-const ZOOM_LEVEL = 3
+const MIN_ZOOM = 0.1
+const MAX_ZOOM = 10
+const ZOOM_FACTOR = 0.1
 
 function formatCoordsArr(coordArr) {
     return [Math.floor(coordArr[0] / BLOCK_SIZE), Math.floor(coordArr[1] / BLOCK_SIZE)]
@@ -98,8 +100,6 @@ export default function PixelGridCanvas() {
     const [endBlock, setEndBlock] = useState(null)
     const [mousePixelPos, setMousePixelPos] = useState({ x: null, y: null })
     const [lastShapeCoords, setLastShapeCoords] = useState(null)
-    const [zoomActive, setZoomActive] = useState(false)
-    const [zoomedIn, setZoomedIn] = useState(false)
     const [zoom, setZoom] = useState(1)
     const [canDraw, setCanDraw] = useState(false)
     const [loadedImages, setLoadedImages] = useState({})
@@ -119,6 +119,12 @@ export default function PixelGridCanvas() {
         const reservations = getReservation()
         return reservations?.length > 0 ? reservations[0]?.reservationId : null
     })
+
+    // Touch gesture states
+    const [lastTouches, setLastTouches] = useState([])
+    const [initialPinchDistance, setInitialPinchDistance] = useState(0)
+    const [initialZoom, setInitialZoom] = useState(1)
+    const [touchDrawing, setTouchDrawing] = useState(false)
 
     const queryClient = useQueryClient()
 
@@ -326,27 +332,298 @@ export default function PixelGridCanvas() {
         handleResize()
     }, [isFullscreen])
 
-    function getPixelFromMouse(event) {
+    function getPixelFromEvent(event) {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        // Map mouse to actual canvas pixel
-        const x = ((event.clientX - rect.left) * scaleX - offset.x) / zoom;
-        const y = ((event.clientY - rect.top) * scaleY - offset.y) / zoom;
+
+        // Handle both mouse and touch events
+        const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+        // Map event to actual canvas pixel
+        const x = ((clientX - rect.left) * scaleX - offset.x) / zoom;
+        const y = ((clientY - rect.top) * scaleY - offset.y) / zoom;
         return {
             x: Math.max(0, Math.min(Math.floor(x), PIXEL_CANVAS_WIDTH - 1)),
             y: Math.max(0, Math.min(Math.floor(y), PIXEL_CANVAS_HEIGHT - 1)),
         };
     }
 
-    function getBlockFromMouse(event) {
-        const pixelPos = getPixelFromMouse(event);
+    // Keep original mouse function for backward compatibility
+    function getPixelFromMouse(event) {
+        return getPixelFromEvent(event);
+    }
+
+    function getBlockFromEvent(event) {
+        const pixelPos = getPixelFromEvent(event);
         return [
             Math.floor(pixelPos.x / BLOCK_SIZE),
             Math.floor(pixelPos.y / BLOCK_SIZE)
         ];
     }
+
+    // Keep original mouse function for backward compatibility
+    function getBlockFromMouse(event) {
+        return getBlockFromEvent(event);
+    }
+
+    // Touch utility functions
+    function getTouchDistance(touches) {
+        if (touches.length < 2) return 0;
+        const touch1 = touches[0];
+        const touch2 = touches[1];
+        return Math.sqrt(
+            Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+    }
+
+    function getTouchCenter(touches) {
+        if (touches.length === 1) {
+            return { x: touches[0].clientX, y: touches[0].clientY };
+        }
+        const x = (touches[0].clientX + touches[1].clientX) / 2;
+        const y = (touches[0].clientY + touches[1].clientY) / 2;
+        return { x, y };
+    }
+
+    useEffect(() => {
+        const preventPageZoom = (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault()
+            }
+        }
+
+        const preventKeyboardZoom = (e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '0' || e.key === '=' || e.key === '_')) {
+                e.preventDefault()
+            }
+        }
+
+        // Add event listeners to document to prevent page zoom
+        document.addEventListener('wheel', preventPageZoom, { passive: false })
+        document.addEventListener('keydown', preventKeyboardZoom)
+
+        return () => {
+            document.removeEventListener('wheel', preventPageZoom)
+            document.removeEventListener('keydown', preventKeyboardZoom)
+        }
+    }, [])
+
+    // Handle wheel event for zooming
+    function handleWheel(e) {
+        if (e.ctrlKey) {
+            e.preventDefault()
+
+            const rect = canvasRef.current.getBoundingClientRect()
+            const mouseX = (e.clientX - rect.left) * (canvasRef.current.width / rect.width)
+            const mouseY = (e.clientY - rect.top) * (canvasRef.current.height / rect.height)
+
+            // Calculate the point in canvas coordinates (before zoom)
+            const canvasX = (mouseX - offset.x) / zoom
+            const canvasY = (mouseY - offset.y) / zoom
+
+            // Calculate new zoom level
+            const delta = -e.deltaY
+            const zoomChange = delta > 0 ? 1 + ZOOM_FACTOR : 1 - ZOOM_FACTOR
+            const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom * zoomChange))
+
+            // Calculate new offset to keep the mouse point stationary
+            const newOffsetX = mouseX - canvasX * newZoom
+            const newOffsetY = mouseY - canvasY * newZoom
+
+            setZoom(newZoom)
+            setOffset({ x: newOffsetX, y: newOffsetY })
+        }
+    }
+
+    // Touch event handlers
+    function handleTouchStart(e) {
+        e.preventDefault();
+
+        if (activeReservation) {
+            toast.error("Cancel or continue transaction before reserving another.")
+            return
+        }
+
+        const touches = Array.from(e.touches);
+        setLastTouches(touches);
+
+        if (touches.length === 2) {
+            // Two finger touch - start pinch zoom
+            const distance = getTouchDistance(touches);
+            setInitialPinchDistance(distance);
+            setInitialZoom(zoom);
+            setPanning(false);
+            setTouchDrawing(false);
+        } else if (touches.length === 1) {
+            // Single finger touch
+            if (canDraw) {
+                // Start drawing
+                const pixelPos = getPixelFromEvent(e);
+                setMousePixelPos(pixelPos);
+                const block = getBlockFromEvent(e);
+                setTouchDrawing(true);
+                setDrawing(true);
+                setStartBlock(block);
+                setEndBlock(block);
+            } else {
+                // Start panning
+                const touch = touches[0];
+                setPanning(true);
+                setPanStart({
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    ox: offset.x,
+                    oy: offset.y,
+                });
+            }
+        }
+    }
+
+    function handleTouchMove(e) {
+        e.preventDefault();
+
+        const touches = Array.from(e.touches);
+
+        if (touches.length === 2) {
+            // Handle pinch zoom
+            const distance = getTouchDistance(touches);
+            const center = getTouchCenter(touches);
+
+            if (initialPinchDistance > 0) {
+                const scale = distance / initialPinchDistance;
+                const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, initialZoom * scale));
+
+                // Calculate zoom center point
+                const rect = canvasRef.current.getBoundingClientRect();
+                const centerX = (center.x - rect.left) * (canvasRef.current.width / rect.width);
+                const centerY = (center.y - rect.top) * (canvasRef.current.height / rect.height);
+
+                // Calculate the point in canvas coordinates (before zoom)
+                const canvasX = (centerX - offset.x) / zoom;
+                const canvasY = (centerY - offset.y) / zoom;
+
+                // Calculate new offset to keep the center point stationary
+                const newOffsetX = centerX - canvasX * newZoom;
+                const newOffsetY = centerY - canvasY * newZoom;
+
+                setZoom(newZoom);
+                setOffset({ x: newOffsetX, y: newOffsetY });
+            }
+        } else if (touches.length === 1) {
+            const touch = touches[0];
+
+            if (touchDrawing && canDraw) {
+                // Handle drawing
+                const pixel = getPixelFromEvent(e);
+                setMousePixelPos(pixel);
+                const block = getBlockFromEvent(e);
+                setEndBlock(block);
+            } else if (panning && panStart) {
+                // Handle panning
+                const dx = touch.clientX - panStart.x;
+                const dy = touch.clientY - panStart.y;
+                setOffset({
+                    x: panStart.ox + dx,
+                    y: panStart.oy + dy,
+                });
+            }
+        }
+
+        setLastTouches(touches);
+    }
+
+    async function handleTouchEnd(e) {
+        e.preventDefault();
+
+        const touches = Array.from(e.touches);
+
+        if (touches.length === 0) {
+            // All touches ended
+            if (panning) {
+                setPanning(false);
+                setPanStart(null);
+            }
+
+            if (touchDrawing && canDraw && startBlock && endBlock) {
+                // Complete drawing operation (same logic as mouse)
+                const x1 = Math.min(startBlock[0], endBlock[0]);
+                const y1 = Math.min(startBlock[1], endBlock[1]);
+                const x2 = Math.max(startBlock[0], endBlock[0]);
+                const y2 = Math.max(startBlock[1], endBlock[1]);
+
+                const blockCoords = {
+                    topLeft: [x1, y1],
+                    bottomRight: [x2, y2],
+                };
+
+                const width = Math.abs(x2 - x1) + 1;
+                const height = Math.abs(y2 - y1) + 1;
+                const area = width * height;
+
+                if (area < 4) {
+                    toast.error("Cannot reserve area. Please select an area of at least 100 pixels.");
+                    setDrawing(false);
+                    setTouchDrawing(false);
+                    setStartBlock(null);
+                    setEndBlock(null);
+                    return;
+                }
+
+                if (rectOverlaps(blockCoords, allReservations) || rectOverlaps(blockCoords, purchases)) {
+                    toast.error("Cannot reserve overlapping pixels. Please select a free area.");
+                    setDrawing(false);
+                    setTouchDrawing(false);
+                    setStartBlock(null);
+                    setEndBlock(null);
+                    return;
+                }
+
+                const pxTopLeft = blockToPixelCoords(blockCoords.topLeft);
+                const pxBottomRight = [
+                    (blockCoords.bottomRight[0] + 1) * BLOCK_SIZE,
+                    (blockCoords.bottomRight[1] + 1) * BLOCK_SIZE,
+                ];
+
+                const coords = {
+                    topLeft: pxTopLeft,
+                    bottomRight: pxBottomRight,
+                };
+
+                setLastShapeCoords(coords);
+                setModalCoords(coords);
+                setShowReserveModal(true);
+            }
+
+            setTouchDrawing(false);
+            setDrawing(false);
+            setStartBlock(null);
+            setEndBlock(null);
+            setInitialPinchDistance(0);
+            setInitialZoom(1);
+        } else if (touches.length === 1 && lastTouches.length === 2) {
+            // Switched from two finger to one finger - stop zooming, potentially start panning
+            setInitialPinchDistance(0);
+            setInitialZoom(1);
+
+            if (!canDraw) {
+                const touch = touches[0];
+                setPanning(true);
+                setPanStart({
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    ox: offset.x,
+                    oy: offset.y,
+                });
+            }
+        }
+
+        setLastTouches(touches);
+    }
+
     function handleMouseDown(e) {
         e.preventDefault()
         if (e.button === 2) return
@@ -362,25 +639,6 @@ export default function PixelGridCanvas() {
                 ox: offset.x,
                 oy: offset.y,
             })
-            return
-        }
-        if (zoomActive && !zoomedIn) {
-            const rect = canvasRef.current.getBoundingClientRect()
-            const mouseX = (e.clientX - rect.left - offset.x) / canvasScale / zoom
-            const mouseY = (e.clientY - rect.top - offset.y) / canvasScale / zoom
-            const zoomLevel = ZOOM_LEVEL
-            const canvasW = PIXEL_CANVAS_WIDTH * canvasScale
-            const canvasH = PIXEL_CANVAS_HEIGHT * canvasScale
-            const centerX = mouseX * canvasScale * zoomLevel
-            const centerY = mouseY * canvasScale * zoomLevel
-            const newOffset = {
-                x: canvasW / 2 - centerX,
-                y: canvasH / 2 - centerY,
-            }
-            setZoom(zoomLevel)
-            setOffset(newOffset)
-            setZoomedIn(true)
-            setZoomActive(false)
             return
         }
         if (!canDraw) return
@@ -468,15 +726,9 @@ export default function PixelGridCanvas() {
         setEndBlock(null)
     }
 
-    function handleZoomClick() {
-        if (!zoomedIn) {
-            setZoomActive((prev) => !prev)
-        } else {
-            setZoom(1)
-            setOffset({ x: 0, y: 0 })
-            setZoomedIn(false)
-            setZoomActive(false)
-        }
+    function handleResetZoom() {
+        setZoom(1)
+        setOffset({ x: 0, y: 0 })
     }
 
     function handleCanDrawToggle() {
@@ -556,11 +808,10 @@ export default function PixelGridCanvas() {
                 expandClick={toggleFullscreen}
                 mousePixelPos={mousePixelPos}
                 lastShapeCoords={lastShapeCoords}
-                zoomActive={zoomActive}
-                onZoomClick={handleZoomClick}
-                zoomedIn={zoomedIn}
                 canDraw={canDraw}
                 onCanDrawToggle={handleCanDrawToggle}
+                zoom={zoom}
+                onResetZoom={handleResetZoom}
             />
             <canvas
                 ref={canvasRef}
@@ -574,7 +825,7 @@ export default function PixelGridCanvas() {
                     maxWidth: "100vw",
                     maxHeight: "calc(100vh - 120px)",
                     display: "block",
-                    cursor: zoomActive ? "zoom-in" : panning ? "grab" : drawing && canDraw ? "crosshair" : "pointer",
+                    cursor: panning ? "grab" : drawing && canDraw ? "crosshair" : "pointer",
                     userSelect: "none",
                 }}
                 onMouseDown={handleMouseDown}
@@ -582,6 +833,11 @@ export default function PixelGridCanvas() {
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
                 onContextMenu={handleContextMenu}
+                onWheel={handleWheel}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onTouchCancel={handleTouchEnd}
             />
             <ReservedShapePopover
                 coords={modalCoords}

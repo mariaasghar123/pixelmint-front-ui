@@ -2,7 +2,7 @@
 import { useState } from "react"
 import AuthModal from "./AuthModal"
 import Button from "./ui/Button"
-import { FaExpand, FaCompress, FaSearchPlus, FaSearchMinus } from "react-icons/fa"
+import { FaExpand, FaCompress, FaHome } from "react-icons/fa"
 
 function PixelLegend() {
     return (
@@ -31,11 +31,10 @@ function TopBar({
     isExpanded,
     mousePixelPos,
     expandClick,
-    zoomActive,
-    onZoomClick,
-    zoomedIn,
     canDraw,
     onCanDrawToggle,
+    zoom,
+    onResetZoom,
 }) {
     const [showModal, setShowModal] = useState(false)
 
@@ -43,14 +42,26 @@ function TopBar({
         onCanDrawToggle()
     }
 
+    const isZoomed = zoom !== 1
+
     return (
         <>
             <AuthModal open={showModal} onClose={() => setShowModal(false)} />
             <div className="rounded-t-lg w-full bg-[#0d2320] flex flex-col-reverse items-center justify-between p-3 lg:px-5 lg:py-3 border-b border-[#142d29] min-h-14">
                 <div className="w-full md:mb-2 mt-2">
                     <div className="text-gray-400 text-left text-sm lg:text-base font-aria hidden md:block">
-                        The selected pixels will be <span className="text-green-200">reserved for 10 minutes</span>. If you do not
-                        complete your transaction within this time, the pixels will be available for purchase by others.
+                        {canDraw ? (
+                            <>
+                                The selected pixels will be <span className="text-green-200">reserved for 10 minutes</span>. If you do not
+                                complete your transaction within this time, the pixels will be available for purchase by others.
+                            </>
+                        ) : (
+                            <>
+                                Hold <span className="text-green-200">Ctrl + Scroll</span> to zoom in/out.
+                                Current zoom: <span className="text-green-200">{Math.round(zoom * 100)}%</span>.
+                                Hold <span className="text-green-200">Ctrl + Drag</span> to pan the canvas.
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -63,6 +74,11 @@ function TopBar({
                                 : "(–,–)"}
                         </span>
                         <span className="whitespace-nowrap">Block: 5x5 Pixels($2.5)</span>
+                        {isZoomed && (
+                            <span className="whitespace-nowrap text-green-200">
+                                Zoom: {Math.round(zoom * 100)}%
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2 lg:gap-3 flex-wrap lg:flex-nowrap">
@@ -83,23 +99,16 @@ function TopBar({
                             </div>
                         )}
 
-                        <button
-                            className={`cursor-pointer p-2 rounded transition duration-150 ease ${zoomActive ? "bg-[#19992c] ring ring-primary" : "bg-[#18312c] hover:bg-[#19992c]/80"
-                                }`}
-                            title={zoomedIn ? "Zoom Out" : "Zoom In"}
-                            onClick={onZoomClick}
-                            style={{
-                                color: "#fff",
-                                outline: zoomActive ? "2px solid #19992c" : undefined,
-                                boxShadow: zoomActive ? "0 0 0 2px #19992c inset" : undefined,
-                            }}
-                        >
-                            {zoomedIn ? (
-                                <FaSearchMinus size={16} className="w-5 h-5" />
-                            ) : (
-                                <FaSearchPlus size={16} className="w-5 h-5" />
-                            )}
-                        </button>
+                        {isZoomed && (
+                            <button
+                                className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                                title="Reset Zoom"
+                                onClick={onResetZoom}
+                                style={{ color: "#fff" }}
+                            >
+                                <FaHome size={16} className="w-5 h-5" />
+                            </button>
+                        )}
 
                         <button
                             onClick={expandClick}
@@ -125,4 +134,3 @@ function TopBar({
 }
 
 export default TopBar
-
