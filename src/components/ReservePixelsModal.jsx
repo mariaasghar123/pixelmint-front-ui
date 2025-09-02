@@ -25,7 +25,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
         const width = coords.bottomRight[0] - coords.topLeft[0]
         const height = coords.bottomRight[1] - coords.topLeft[1]
         const area = width * height
-        const price = (area / 100) * 10
+        const price = area
 
         return { area, price, width, height }
     }
@@ -40,7 +40,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                     <div className="flex justify-between">
                         <span className="text-green-100">Dimensions:</span>
                         <span className="text-green-200 font-mono">
-                            {width} × {height}px
+                            {width}px × {height}px
                         </span>
                     </div>
                     <div className="flex justify-between">
@@ -52,7 +52,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                         <span className="text-green-200 font-mono font-bold text-lg">${price.toFixed(2)}</span>
                     </div>
                 </div>
-                <div className="text-green-100/70 text-xs text-center mt-2">Rate: $10 per 100 pixels</div>
+                <div className="text-green-100/70 text-xs text-center mt-2">Rate: $1 per pixel</div>
             </div>
         )
     }

@@ -60,7 +60,7 @@ export default function Sidebar() {
     const tabs = getTabsForPath(pathname);
 
     return (
-        <aside className="bg-dark-800 min-h-[calc(100dvh - 1.25rem)] w-44 flex flex-col py-6 px-4 rounded-2xl min-w-[250px]">
+        <aside className="bg-dark-800 min-h-[calc(100dvh - 1.25rem)] w-44 hidden md:flex flex-col py-6 px-4 rounded-2xl min-w-[250px]">
             <div className="flex items-center justify-center gap-2 mb-3 px-2" >
                 <img src="/logo_no_label.svg" alt="Logo" width={32} height={32} />
                 <span className="font-semibold font-ari text-2xl">

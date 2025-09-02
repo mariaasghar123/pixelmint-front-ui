@@ -19,11 +19,13 @@ export default function Layout({ children }) {
     if (loading || !user?.user) return <Loader />;
 
     return (
-        <div className="flex min-h-[100dvh] w-full p-4 gap-4">
+        <div className="flex min-h-[100dvh] w-full md:p-4 gap-4">
             <Sidebar />
             <div className="flex-1">
                 <Header />
-                {children}
+                <div className="p-4 md:p-0">
+                    {children}
+                </div>
             </div>
         </div>
     );

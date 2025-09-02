@@ -3,10 +3,9 @@
 import { Eye } from "lucide-react"
 
 export default function AdsList({ ads = [], onOpen }) {
-    console.log(ads)
 
     return (
-        <section className="bg-dark-800 rounded-xl p-6 w-full mt-5 mx-auto">
+        <section className="bg-dark-800 rounded-xl p-4 md:p-6 w-full mt-5 mx-auto">
             <h2 className="text-white font-semibold text-lg mb-4">Active Advertisements</h2>
             <div className="flex flex-col gap-4">
                 {ads?.map((ad) => (

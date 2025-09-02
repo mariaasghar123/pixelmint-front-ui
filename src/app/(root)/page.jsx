@@ -7,24 +7,7 @@ import { MdGridOn } from "react-icons/md"
 import { FaUsers } from "react-icons/fa"
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/api";
-
-const stats = [
-    {
-        icon: MdGridOn,
-        value: "404",
-        label: "PIXELS SOLD",
-    },
-    {
-        icon: FaUsers,
-        value: "1 $USDT",
-        label: "PIXELS RATE",
-    },
-    {
-        icon: FaUsers,
-        value: "10 x 10px",
-        label: "MINIMUM BUY",
-    },
-]
+import { useTotalPixelPurchased } from "@/api/pixel";
 
 const buyers = [
     {
@@ -66,7 +49,6 @@ export default function Home() {
         queryKey: ['top-buyers'],
         queryFn: async () => {
             const data = await api.get("/user/top-area-buyers")
-            console.log(data)
             return data.data.payload
         }
     })
@@ -75,10 +57,30 @@ export default function Home() {
         queryKey: ['recent-buyers'],
         queryFn: async () => {
             const data = await api.get("/user/top-recent-buyers")
-            console.log(data)
             return data.data.payload
         }
     })
+
+    const { data: totalPixels, isLoading, isError } = useTotalPixelPurchased()
+
+    const stats = [
+        {
+            icon: MdGridOn,
+            value: (isLoading || isError) ? "404" : totalPixels,
+            label: "PIXELS SOLD",
+        },
+        {
+            icon: FaUsers,
+            value: "1 $USDT",
+            label: "PIXELS RATE",
+        },
+        {
+            icon: FaUsers,
+            value: "10 x 10px",
+            label: "MINIMUM BUY",
+        },
+    ]
+
 
     return (
         <main className="w-[90%] mx-auto flex flex-col gap-6 my-6">

@@ -1,27 +1,37 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Wallet, Shield, Zap } from "lucide-react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/components/AuthProvider";
 import { useAppKit } from "@reown/appkit/react";
-import { useConnect } from "wagmi";
+import { useAccount } from "wagmi";
 
 export default function Login() {
     const { open } = useAppKit();
     const [loading, setLoading] = useState(false);
-    const { isConnected } = useConnect()
+    const { address, isConnected } = useAccount();
     const [step, setStep] = useState("idle");
     const { authenticate } = useAuth();
+
+    // Update step based on connection status
+    useEffect(() => {
+        if (isConnected && address && step !== "authenticating" && step !== "done") {
+            setStep("connected");
+        } else if (!isConnected && step !== "connecting" && step !== "authenticating") {
+            setStep("idle");
+        }
+    }, [isConnected, address, step]);
 
     const handleConnectWallet = async () => {
         setLoading(true);
         setStep("connecting");
         try {
-            if (!isConnected)
+            if (!isConnected) {
                 open();
-            setStep("connected");
+            }
+            // Step will be updated by useEffect when connection is successful
         } catch (e) {
             toast.error(e.message || "Failed to connect wallet");
             setStep("idle");
@@ -31,11 +41,19 @@ export default function Login() {
     };
 
     const handleAuthenticate = async () => {
+        if (!isConnected || !address) {
+            toast.error("Please connect your wallet first");
+            return;
+        }
+
         setLoading(true);
         setStep("authenticating");
         try {
             const success = await authenticate();
             setStep(success ? "done" : "connected");
+        } catch (e) {
+            toast.error(e.message || "Authentication failed");
+            setStep("connected");
         } finally {
             setLoading(false);
         }
@@ -63,6 +81,15 @@ export default function Login() {
                 </h1>
 
                 <p className="mt-2 text-base text-[#A9D7B8] text-center">One Tap, No Passwords.</p>
+
+                {/* Show connected address when wallet is connected */}
+                {isConnected && address && (
+                    <div className="mt-4 px-4 py-2 bg-dark-500 rounded-lg">
+                        <p className="text-xs text-[#A9D7B8] text-center">
+                            Connected: {address.slice(0, 6)}...{address.slice(-4)}
+                        </p>
+                    </div>
+                )}
 
                 <div className="mt-6 flex gap-6 justify-center">
                     <div className="flex flex-col items-center bg-dark-500 rounded-lg justify-center px-8 py-2">
@@ -93,13 +120,15 @@ export default function Login() {
                 {/* Step 2: Authenticate */}
                 {(step === "connected" || step === "authenticating") && (
                     <Button
-                        className="mt-4 w-full py-3 border-none"
+                        className="mt-8 w-full py-3 border-none"
                         style={{
-                            background: "linear-gradient(90deg,#65E78C 0%, #A9D7B8 100%)",
-                            color: "#05281B",
+                            background: isConnected && address
+                                ? "linear-gradient(90deg,#65E78C 0%, #A9D7B8 100%)"
+                                : "rgba(169, 215, 184, 0.3)",
+                            color: isConnected && address ? "#05281B" : "#A9D7B8",
                         }}
                         onClick={handleAuthenticate}
-                        disabled={loading || step === "authenticating"}
+                        disabled={loading || step === "authenticating" || !isConnected || !address}
                     >
                         {loading && step === "authenticating" ? "Authenticating..." : "Authenticate"}
                     </Button>

@@ -6,7 +6,7 @@ import { FaTelegram } from "react-icons/fa";
 
 export default function SupportCards() {
     const [copied, setCopied] = useState(false);
-    const [uniqueCode, setUniqueCode] = useState("04721983")
+    const [uniqueCode, setUniqueCode] = useState("04721983");
 
     const handleCopy = () => {
         navigator.clipboard.writeText(uniqueCode);
@@ -15,8 +15,8 @@ export default function SupportCards() {
     };
 
     return (
-        <div className="flex gap-6 w-full mx-auto mt-6">
-            <div className="flex-1 bg-dark-800 rounded-lg p-5 min-w-[300px] flex flex-col ">
+        <div className="flex flex-col md:flex-row gap-6 w-full mx-auto mt-6">
+            <div className="flex-1 bg-dark-800 rounded-lg p-5 min-w-[300px] flex flex-col">
                 <h3 className="text-2xl font-semibold text-white mb-1">Your Unique Code</h3>
                 <p className="text-xl text-gray-400 mb-4">
                     You can use this unique code to message admin via Telegram.
@@ -40,7 +40,7 @@ export default function SupportCards() {
             </div>
 
             {/* Support Card */}
-            <div className="flex-1 bg-dark-800 rounded-lg p-5 min-w-[300px]">
+            <div className="flex-1 bg-dark-800 rounded-lg p-5 min-w-[300px] flex flex-col">
                 <h3 className="text-2xl font-semibold text-white mb-1">Support</h3>
                 <p className="text-xl text-gray-400 mb-4">
                     Need help? Contact admin directly via Telegram.<br />

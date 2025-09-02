@@ -29,13 +29,20 @@ export default function AdsModal({ open, onClose, ad }) {
                 <div className="text-4xl font-semibold mb-6 text-white font-ari tracking-tight">Ad Details</div>
 
                 <div className="w-full text-white space-y-6">
-                    {/* Ad Image */}
-                    <div className="flex justify-center mb-6">
-                        <div className="w-32 h-32 rounded-lg overflow-hidden bg-dark-900 flex items-center justify-center border border-dark-600">
+                    <div className="flex flex-col items-center mb-6 w-full">
+                        <div className="w-32 h-32 rounded-lg overflow-hidden bg-dark-900 flex items-center justify-center border border-dark-600 relative">
+                            {ad.moderatorNote && (
+                                <div className="absolute top-0 left-0 w-full h-full bg-red-900/70 flex items-center justify-center z-10">
+                                    <span className="px-4 py-2 text-red-200 font-bold rounded bg-red-600/80 shadow-lg text-center">
+                                        Removed by Admin
+                                    </span>
+                                </div>
+                            )}
                             <img
                                 src={ad.adImageUrl || "/default-ad-logo.png"}
                                 alt={ad.adTitle}
-                                className="w-full h-full object-cover"
+                                className={`w-full h-full object-cover ${ad.moderatorNote ? "opacity-40 grayscale" : ""}`}
+                                style={{ zIndex: 1 }}
                             />
                         </div>
                     </div>
@@ -96,9 +103,17 @@ export default function AdsModal({ open, onClose, ad }) {
 
                     {/* Ad ID */}
                     <div>
-                        <label className="text-sm font-medium text-dark-300 block mb-1">Ad ID</label>
+                        <label className="text-sm font-medium text-dark-300 block mb-1">AD ID</label>
                         <div className="bg-dark-700 rounded-lg px-4 py-3 text-dark-400 text-sm font-mono">{ad._id}</div>
                     </div>
+
+                    {
+                        !!ad.moderatorNote &&
+                        <div>
+                            <label className="text-sm font-medium text-dark-300 block mb-1">Moderator Note</label>
+                            <div className="bg-dark-700 rounded-lg px-4 py-3 text-sm font-mono text-red-400">{ad.moderatorNote}</div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

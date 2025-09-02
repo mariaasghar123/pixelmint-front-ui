@@ -7,11 +7,10 @@ import { useAuth } from "@/components/AuthProvider"
 import UserIcon from "@/components/ui/UserIcon"
 import { usePathname } from "next/navigation"
 
-const MENU_ITEMS = [
-    { label: "About", href: "#" },
-    { label: "Litepaper", href: "#" },
-    { label: "Become Affiliate", href: "#" },
-]
+// const MENU_ITEMS = [
+//     { label: "About", href: "#" },
+//     { label: "Litepaper", href: "#" },
+// ]
 
 export default function Navbar() {
     const { logout, loading, user } = useAuth()
@@ -35,20 +34,24 @@ export default function Navbar() {
                 </div>
 
                 <div className="hidden md:flex items-center gap-2 relative">
-                    {MENU_ITEMS.map((item, i) => (
-                        <Link key={i} href={item.href}>
-                            <Button
-                                className={`border text-green-100 
-                                    ${pathname === item.href ? "bg-green-100/20 font-semibold" : "bg-green-100/10"} `}
-                            >
-                                {item.label}
-                            </Button>
-                        </Link>
-                    ))}
+                    {/* {MENU_ITEMS.map((item, i) => ( */}
+                    {/*     <Link key={i} href={item.href}> */}
+                    {/*         <Button */}
+                    {/*             className={`border text-green-100  */}
+                    {/*                 ${pathname === item.href ? "bg-green-100/20 font-semibold" : "bg-green-100/10"} `} */}
+                    {/*         > */}
+                    {/*             {item.label} */}
+                    {/*         </Button> */}
+                    {/*     </Link> */}
+                    {/* ))} */}
+                    {/**/}
+                    {/* <Button> */}
+                    {/*     Become Affiliate */}
+                    {/* </Button> */}
 
                     {!user ? (
                         <Link href="/auth/login">
-                            <Button color="connect" disabled={loading}>
+                            <Button disabled={loading}>
                                 Connect Wallet
                             </Button>
                         </Link>
@@ -58,12 +61,23 @@ export default function Navbar() {
                             {dropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-44 bg-dark-600 rounded-lg shadow-lg z-10 flex flex-col py-2 border border-border">
                                     <Link
-                                        href={user?.user?.role === "admin" ? "/admin" : "/user"}
+                                        href="/user"
                                         className="px-4 py-2 text-light hover:bg-dark-700 hover:text-primary rounded transition"
                                         onClick={() => setDropdownOpen(false)}
                                     >
                                         Dashboard
                                     </Link>
+                                    {user?.user?.role &&
+                                        <Link
+                                            href="/admin"
+                                            className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
+                                        ${(pathname === "/admin") ? "bg-green-100/20 font-semibold text-green-100" : ""}
+                                        hover:bg-dark-600 hover:text-green-200`}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Admin
+                                        </Link>
+                                    }
                                     <button
                                         className="px-4 py-2 text-left text-red-400 hover:bg-dark-700 rounded transition"
                                         onClick={handleLogout}
@@ -106,18 +120,25 @@ export default function Navbar() {
             <div className={`md:hidden absolute w-full top-full left-0 right-0 z-50 overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? "max-h-96" : "max-h-0"}`}>
                 <div className="bg-dark-700 border-t border-border shadow-lg">
                     <div className="container w-[90%] mx-auto py-4 flex flex-col gap-1">
-                        {MENU_ITEMS.map((item, i) => (
-                            <Link
-                                key={i}
-                                href={item.href}
-                                className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
-                                    ${pathname === item.href ? "bg-green-100/20 font-semibold text-green-100" : ""}
-                                    hover:bg-dark-600 hover:text-green-200`}
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
+                        {/* {MENU_ITEMS.map((item, i) => ( */}
+                        {/*     <a */}
+                        {/*         key={i} */}
+                        {/*         href={item.href} */}
+                        {/*         className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none */}
+                        {/*             hover:bg-dark-600 hover:text-green-200`} */}
+                        {/*         onClick={() => setMobileMenuOpen(false)} */}
+                        {/*     > */}
+                        {/*         {item.label} */}
+                        {/*     </a> */}
+                        {/* ))} */}
+                        {/* <Link */}
+                        {/*     href="#" */}
+                        {/*     className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none */}
+                        {/*             hover:bg-dark-600 hover:text-green-200`} */}
+                        {/*     onClick={() => setMobileMenuOpen(false)} */}
+                        {/* > */}
+                        {/*     Become Affiliate */}
+                        {/* </Link> */}
 
                         {!user ? (
                             <div className="pt-2 px-4">
@@ -130,14 +151,25 @@ export default function Navbar() {
                         ) : (
                             <div className="flex flex-col gap-1 pt-2 mt-2 border-t border-border">
                                 <Link
-                                    href={user?.user?.role === "admin" ? "/admin" : "/user"}
+                                    href="/user"
                                     className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
-                                        ${(pathname === "/admin" || pathname === "/user") ? "bg-green-100/20 font-semibold text-green-100" : ""}
+                                        ${(pathname === "/user") ? "bg-green-100/20 font-semibold text-green-100" : ""}
                                         hover:bg-dark-600 hover:text-green-200`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     Dashboard
                                 </Link>
+                                {user?.user?.role &&
+                                    <Link
+                                        href="/admin"
+                                        className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
+                                        ${(pathname === "/admin") ? "bg-green-100/20 font-semibold text-green-100" : ""}
+                                        hover:bg-dark-600 hover:text-green-200`}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Admin
+                                    </Link>
+                                }
                                 <Button
                                     className="!bg-error border-none"
                                     onClick={handleLogout}
@@ -150,6 +182,6 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
-        </header>
+        </header >
     )
 }

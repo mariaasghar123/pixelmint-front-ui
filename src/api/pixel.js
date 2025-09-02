@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query"
 import api from '@/lib/api';
 
 export async function purchasePixelMutation(data) {
@@ -29,5 +30,19 @@ export async function purchasePixelMutation(data) {
         }
         throw new Error(message);
     }
+}
+
+const fetchTotalPixels = async () => {
+    const data = await api.get('/pixel/total-purchase')
+    return data.data.payload.totalPixels
+}
+
+
+export function useTotalPixelPurchased(opts) {
+    return useQuery({
+        queryKey: ['recentBuyers'],
+        queryFn: fetchTotalPixels,
+        ...opts
+    })
 }
 

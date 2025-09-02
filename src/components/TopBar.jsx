@@ -2,7 +2,7 @@
 import { useState } from "react"
 import AuthModal from "./AuthModal"
 import Button from "./ui/Button"
-import { FaExpand, FaCompress, FaHome, FaSearchPlus, FaPlus, FaMinus, FaCrosshairs } from "react-icons/fa"
+import { FaExpand, FaCompress, FaHome, FaSearchPlus, FaPlus, FaMinus, FaCrosshairs, FaSearchMinus } from "react-icons/fa"
 
 function PixelLegend() {
     return (
@@ -70,7 +70,7 @@ function TopBar({
                 </>
             )
         }
-        
+
         if (isMobile) {
             return (
                 <>
@@ -79,22 +79,22 @@ function TopBar({
                 </>
             )
         }
-        
+
         if (magnifierActive) {
             return (
                 <>
-                    <span className="text-green-200">Magnifier Active:</span> Move to inspect, <span className="text-green-200">click to zoom in</span>. 
+                    <span className="text-green-200">Magnifier Active:</span> Move to inspect, <span className="text-green-200">click to zoom in</span>.
                     Magnification: <span className="text-green-200">{magnifierZoom}x</span>, Canvas: <span className="text-green-200">{getCurrentZoomInfo()}</span>.
                     Use <span className="text-green-200">scroll wheel</span> to adjust magnifier.
                 </>
             )
         }
-        
+
         return (
             <>
                 Hold <span className="text-green-200">Ctrl + Scroll</span> to zoom in/out.
                 Current zoom: <span className="text-green-200">{Math.round(zoom * 100)}%</span>.
-                Hold <span className="text-green-200">Ctrl + Drag</span> to pan. 
+                Hold <span className="text-green-200">Ctrl + Drag</span> to pan.
                 Use the <span className="text-green-200">magnifier tool</span> for precision zooming.
             </>
         )
@@ -118,10 +118,10 @@ function TopBar({
                                 ? `(${mousePixelPos.x}, ${mousePixelPos.y})`
                                 : "(–,–)"}
                         </span>
-                        <span className="whitespace-nowrap">Block: 5x5 Pixels($2.5)</span>
+                        <span className="whitespace-nowrap">Block: 5x5 Pixels($25)</span>
                         {(isZoomed || magnifierActive) && (
                             <span className="whitespace-nowrap text-green-200">
-                                {magnifierActive 
+                                {magnifierActive
                                     ? `Canvas: ${getCurrentZoomInfo()} | Magnifier: ${magnifierZoom}x`
                                     : `Zoom: ${Math.round(zoom * 100)}%`
                                 }
@@ -150,20 +150,30 @@ function TopBar({
                         {!isMobile && (
                             <>
                                 <button
-                                    className={`cursor-pointer p-2 rounded transition duration-150 ease ${
-                                        magnifierActive 
-                                            ? 'bg-green-500 hover:bg-green-600 text-white' 
-                                            : 'bg-[#18312c] hover:bg-[#19992c]/80 text-white'
-                                    }`}
+                                    className={`cursor-pointer p-2 rounded transition duration-150 ease ${magnifierActive
+                                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                                        : 'bg-[#18312c] hover:bg-[#19992c]/80 text-white'
+                                        }`}
                                     title={magnifierActive ? "Disable Magnifier" : "Enable Magnifier (Click to zoom in)"}
                                     onClick={onMagnifierToggle}
                                 >
                                     <FaSearchPlus size={16} className="w-5 h-5" />
                                 </button>
 
+                                {isZoomed && (
+                                    <button
+                                        className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                                        title="Reset Zoom"
+                                        onClick={onResetZoom}
+                                        style={{ color: "#fff" }}
+                                    >
+                                        <FaSearchMinus size={16} className="w-5 h-5" />
+                                    </button>
+                                )}
+
                                 {magnifierActive && (
                                     <>
-                                        <div className="flex items-center gap-1 bg-[#18312c] rounded p-1">
+                                        <div className="flex items-center gap-1 bg-[#18312c] rounded p-1 h-full">
                                             <button
                                                 className="cursor-pointer p-1 rounded hover:bg-[#19992c]/80 transition duration-150 ease text-white"
                                                 title="Decrease Magnification"
@@ -182,7 +192,7 @@ function TopBar({
                                                 <FaPlus size={12} />
                                             </button>
                                         </div>
-                                        
+
                                         <div className="flex items-center gap-1 bg-[#18312c] rounded p-2">
                                             <FaCrosshairs size={14} className="text-green-200" />
                                             <span className="text-green-200 text-sm">
@@ -194,16 +204,6 @@ function TopBar({
                             </>
                         )}
 
-                        {isZoomed && (
-                            <button
-                                className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
-                                title="Reset Zoom"
-                                onClick={onResetZoom}
-                                style={{ color: "#fff" }}
-                            >
-                                <FaHome size={16} className="w-5 h-5" />
-                            </button>
-                        )}
 
                         <button
                             onClick={expandClick}

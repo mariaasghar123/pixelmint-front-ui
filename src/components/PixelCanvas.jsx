@@ -25,7 +25,7 @@ const GRID_WIDTH = TOTAL_WIDTH / BLOCK_SIZE
 const GRID_HEIGHT = TOTAL_HEIGHT / BLOCK_SIZE
 const PIXEL_CANVAS_WIDTH = GRID_WIDTH * BLOCK_SIZE
 const PIXEL_CANVAS_HEIGHT = GRID_HEIGHT * BLOCK_SIZE
-const MIN_ZOOM = 0.1
+const MIN_ZOOM = 1
 const MAX_ZOOM = 20
 const ZOOM_FACTOR = 0.1
 
@@ -39,18 +39,14 @@ const MAX_MAGNIFIER_ZOOM = 20
 const CLICK_ZOOM_LEVELS = [5, 10, 15, 20]
 
 function formatCoordsArr(coordArr) {
-    return [Math.floor(coordArr[0] / BLOCK_SIZE), Math.floor(coordArr[1] / BLOCK_SIZE)]
+    console.log(coordArr)
+    const formatted = [Math.floor(Math.ceil(coordArr[0] / 5) * 5 / BLOCK_SIZE), Math.floor((coordArr[1] / 5) * 5 / BLOCK_SIZE)]
+    return formatted
 }
 
 function blockToPixelCoords(blockArr) {
     return [blockArr[0] * BLOCK_SIZE, blockArr[1] * BLOCK_SIZE]
 }
-
-const propShapes = [
-    { topLeft: [50, 40], bottomRight: [80, 60], color: COLOR_PROP_SHAPE, image: shopverseImg },
-    { topLeft: [15, 5], bottomRight: [30, 14], color: COLOR_PROP_SHAPE, image: shopverseImg },
-    { topLeft: [40, 20], bottomRight: [60, 28], color: COLOR_PROP_SHAPE, image: shopverseImg },
-]
 
 async function postReservation(reservationId, pixelArea) {
     try {
@@ -90,7 +86,7 @@ function rectOverlaps(rect, rects) {
         const [rx1, ry1] = rTopLeft
         const [rx2, ry2] = rBottomRight
 
-        if (!(x2 < rx1 || x1 > rx2 || y2 < ry1 || y1 > ry2)) {
+        if (!(x2 <= rx1 || x1 >= rx2 || y2 <= ry1 || y1 >= ry2)) {
             return true
         }
     }
@@ -316,13 +312,6 @@ export default function PixelGridCanvas() {
             }
         }
 
-        // Draw propShapes (static shapes)
-        if (canDraw) {
-            for (const rect of propShapes) {
-                drawRectOnGrid(ctx, rect.topLeft, rect.bottomRight, BLOCK_SIZE, COLOR_PROP_SHAPE)
-            }
-        }
-
         // Draw reservations (excluding active reservation)
         if (canDraw) {
             allReservations.forEach((reservation) => {
@@ -436,13 +425,6 @@ export default function PixelGridCanvas() {
                         isAuthenticated?.user?.userId === rect.userId ? COLOR_DRAW_PREVIEW : COLOR_PROP_SHAPE,
                     )
                 }
-            }
-        }
-
-        // Draw propShapes
-        if (canDraw) {
-            for (const rect of propShapes) {
-                drawRectOnGrid(tempCtx, rect.topLeft, rect.bottomRight, BLOCK_SIZE, COLOR_PROP_SHAPE)
             }
         }
 
@@ -616,8 +598,8 @@ export default function PixelGridCanvas() {
         const x = ((clientX - rect.left) * scaleX - offset.x) / zoom;
         const y = ((clientY - rect.top) * scaleY - offset.y) / zoom;
         return {
-            x: Math.max(0, Math.min(Math.floor(x), PIXEL_CANVAS_WIDTH - 1)),
-            y: Math.max(0, Math.min(Math.floor(y), PIXEL_CANVAS_HEIGHT - 1)),
+            x: Math.max(0, Math.min(Math.floor(x), PIXEL_CANVAS_WIDTH)),
+            y: Math.max(0, Math.min(Math.floor(y), PIXEL_CANVAS_HEIGHT)),
         };
     }
 
@@ -627,10 +609,11 @@ export default function PixelGridCanvas() {
 
     function getBlockFromEvent(event) {
         const pixelPos = getPixelFromEvent(event);
-        return [
+        const blocks = [
             Math.floor(pixelPos.x / BLOCK_SIZE),
             Math.floor(pixelPos.y / BLOCK_SIZE)
-        ];
+        ]
+        return blocks;
     }
 
     function getBlockFromMouse(event) {
@@ -747,9 +730,9 @@ export default function PixelGridCanvas() {
             if (canDraw) {
                 const pixelPos = getPixelFromEvent(e);
                 setMousePixelPos(pixelPos);
-                const block = getBlockFromEvent(e);
                 setTouchDrawing(true);
                 setDrawing(true);
+                const block = formatCoordsArr([pixelPos.x, pixelPos.y])
                 setStartBlock(block);
                 setEndBlock(block);
             } else {
@@ -797,7 +780,7 @@ export default function PixelGridCanvas() {
             if (touchDrawing && canDraw) {
                 const pixel = getPixelFromEvent(e);
                 setMousePixelPos(pixel);
-                const block = getBlockFromEvent(e);
+                const block = formatCoordsArr([pixel.x, pixel.y])
                 setEndBlock(block);
             } else if (panning && panStart) {
                 const dx = touch.clientX - panStart.x;
@@ -847,10 +830,9 @@ export default function PixelGridCanvas() {
                     return;
                 }
 
-                // Check overlap with all reservations, purchases, AND propShapes
+                // Check overlap with all reservations, purchases
                 if (rectOverlaps(blockCoords, allReservations) ||
-                    rectOverlaps(blockCoords, purchases ? purchases.map(p => ({ pixelArea: p.pixelArea })) : []) ||
-                    rectOverlaps(blockCoords, propShapes)) {
+                    rectOverlaps(blockCoords, purchases ? purchases.map(p => ({ pixelArea: p.pixelArea })) : [])) {
                     toast.error("Cannot reserve overlapping pixels. Please select a free area.");
                     setDrawing(false);
                     setTouchDrawing(false);
@@ -928,17 +910,18 @@ export default function PixelGridCanvas() {
         if (!canDraw) return
         const pixelPos = getPixelFromMouse(e)
         setMousePixelPos(pixelPos)
-        const block = getBlockFromMouse(e)
         setDrawing(true)
-        setStartBlock(block)
-        setEndBlock(block)
+        const block = formatCoordsArr([pixelPos.x, pixelPos.y])
+        console.log(block)
+        setStartBlock(block);
+        setEndBlock(block);
     }
 
     function handleMouseMove(e) {
         e.preventDefault()
         const pixel = getPixelFromMouse(e)
         setMousePixelPos(pixel)
-        const block = getBlockFromMouse(e)
+        const block = formatCoordsArr([pixel.x, pixel.y])
 
         // Update magnifier position
         if (!isMobile && magnifierActive) {
@@ -946,7 +929,7 @@ export default function PixelGridCanvas() {
         }
 
         if (drawing) {
-            setEndBlock(block)
+            setEndBlock(block);
         } else if (panning && panStart) {
             const dx = e.clientX - panStart.x
             const dy = e.clientY - panStart.y
@@ -994,10 +977,9 @@ export default function PixelGridCanvas() {
                 return
             }
 
-            // Check overlap with all reservations, purchases, AND propShapes
+            // Check overlap with all reservations, purchases (DESKTOP)
             if (rectOverlaps(blockCoords, allReservations) ||
-                rectOverlaps(blockCoords, purchases ? purchases.map(p => ({ pixelArea: p.pixelArea })) : []) ||
-                rectOverlaps(blockCoords, propShapes)) {
+                rectOverlaps(blockCoords, purchases ? purchases.map(p => ({ pixelArea: p.pixelArea })) : [])) {
                 toast.error("Cannot reserve overlapping pixels. Please select a free area.")
                 setDrawing(false)
                 setStartBlock(null)
@@ -1007,8 +989,8 @@ export default function PixelGridCanvas() {
 
             const pxTopLeft = blockToPixelCoords(blockCoords.topLeft)
             const pxBottomRight = [
-                (blockCoords.bottomRight[0] + 1) * BLOCK_SIZE,
-                (blockCoords.bottomRight[1] + 1) * BLOCK_SIZE,
+                (blockCoords.bottomRight[0]) * BLOCK_SIZE,
+                (blockCoords.bottomRight[1]) * BLOCK_SIZE,
             ]
 
             const coords = {
@@ -1194,8 +1176,8 @@ function drawRectOnGrid(ctx, topLeft, bottomRight, blockSize, color) {
     const y2 = Math.max(topLeft[1], bottomRight[1])
     const px = x1 * blockSize
     const py = y1 * blockSize
-    const width = (x2 - x1 + 1) * blockSize
-    const height = (y2 - y1 + 1) * blockSize
+    const width = (x2 - x1) * blockSize
+    const height = (y2 - y1) * blockSize
 
     ctx.fillStyle = `${color}33`
     ctx.fillRect(px, py, width, height)
