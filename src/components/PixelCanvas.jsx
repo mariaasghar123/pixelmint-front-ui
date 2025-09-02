@@ -39,7 +39,6 @@ const MAX_MAGNIFIER_ZOOM = 20
 const CLICK_ZOOM_LEVELS = [5, 10, 15, 20]
 
 function formatCoordsArr(coordArr) {
-    console.log(coordArr)
     const formatted = [Math.floor(Math.ceil(coordArr[0] / 5) * 5 / BLOCK_SIZE), Math.floor((coordArr[1] / 5) * 5 / BLOCK_SIZE)]
     return formatted
 }
@@ -912,7 +911,6 @@ export default function PixelGridCanvas() {
         setMousePixelPos(pixelPos)
         setDrawing(true)
         const block = formatCoordsArr([pixelPos.x, pixelPos.y])
-        console.log(block)
         setStartBlock(block);
         setEndBlock(block);
     }
