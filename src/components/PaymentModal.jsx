@@ -363,7 +363,7 @@ export default function PaymentModal({
         if (initiateCallInProgress.current || !isModalMounted.current) return;
         initiateCallInProgress.current = true;
 
-        if ((!isConnected || !address)) {
+        if (!isAdmin && (!isConnected || !address)) {
             handleError("Please connect your wallet first", ERROR_TYPES.CONNECTION);
             initiateCallInProgress.current = false;
             return;
