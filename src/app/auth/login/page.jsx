@@ -11,52 +11,76 @@ import { useAccount } from "wagmi";
 export default function Login() {
     const { open } = useAppKit();
     const [loading, setLoading] = useState(false);
+    const [buttonClicked, setButtonClicked] = useState(false);
     const { address, isConnected } = useAccount();
     const [step, setStep] = useState("idle");
     const { authenticate } = useAuth();
 
-    // Update step based on connection status
     useEffect(() => {
         if (isConnected && address && step !== "authenticating" && step !== "done") {
             setStep("connected");
         } else if (!isConnected && step !== "connecting" && step !== "authenticating") {
             setStep("idle");
+            setButtonClicked(false);
         }
     }, [isConnected, address, step]);
 
-    const handleConnectWallet = async () => {
-        setLoading(true);
-        setStep("connecting");
-        try {
-            if (!isConnected) {
-                open();
+    useEffect(() => {
+        const handleAuthenticate = async () => {
+            if (isConnected && address && step === "connected") {
+                setLoading(true);
+                setStep("authenticating");
+                try {
+                    const success = await authenticate();
+                    setStep(success ? "done" : "connected");
+                } catch (e) {
+                    toast.error(e.message || "Authentication failed");
+                    setStep("connected");
+                } finally {
+                    setLoading(false);
+                }
             }
-            // Step will be updated by useEffect when connection is successful
-        } catch (e) {
-            toast.error(e.message || "Failed to connect wallet");
-            setStep("idle");
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
-    const handleAuthenticate = async () => {
-        if (!isConnected || !address) {
-            toast.error("Please connect your wallet first");
+        handleAuthenticate();
+    }, [isConnected, address, step]);
+
+    const handleConnectWallet = async () => {
+        if (loading || buttonClicked || isConnected) {
             return;
         }
 
         setLoading(true);
-        setStep("authenticating");
+        setButtonClicked(true);
+        setStep("connecting");
+
         try {
-            const success = await authenticate();
-            setStep(success ? "done" : "connected");
+            if (!isConnected) {
+                await open();
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
         } catch (e) {
-            toast.error(e.message || "Authentication failed");
-            setStep("connected");
+            console.error("Wallet connection error:", e);
+            toast.error(e.message || "Failed to connect wallet");
+            setStep("idle");
+            setButtonClicked(false);
         } finally {
-            setLoading(false);
+            setTimeout(() => {
+                setLoading(false);
+            }, 500);
         }
+    };
+
+    const isButtonDisabled = loading || buttonClicked || isConnected || step === "connecting" || step === "authenticating";
+
+    const getButtonText = () => {
+        if (step === "connecting" || (buttonClicked && !isConnected)) {
+            return "Opening Wallet...";
+        }
+        if (loading && step === "connecting") {
+            return "Connecting Wallet...";
+        }
+        return "Connect Wallet";
     };
 
     return (
@@ -105,46 +129,56 @@ export default function Login() {
                 {/* Step 1: Connect Wallet */}
                 {(step === "idle" || step === "connecting") && (
                     <Button
-                        className="mt-8 w-full py-3 border-none"
+                        className={`mt-8 w-full py-3 border-none transition-opacity duration-200 ${isButtonDisabled ? 'opacity-70 cursor-not-allowed' : ''
+                            }`}
                         style={{
-                            background: "linear-gradient(90deg,#65E78C 0%, #A9D7B8 100%)",
+                            background: isButtonDisabled
+                                ? "linear-gradient(90deg,#4a9960 0%, #7ba88a 100%)"
+                                : "linear-gradient(90deg,#65E78C 0%, #A9D7B8 100%)",
                             color: "#05281B",
                         }}
                         onClick={handleConnectWallet}
-                        disabled={loading || step === "connecting"}
+                        disabled={isButtonDisabled}
                     >
-                        {loading && step === "connecting" ? "Connecting Wallet..." : "Connect Wallet"}
+                        <div className="flex items-center justify-center space-x-2">
+                            {(loading || buttonClicked) && (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#05281B]"></div>
+                            )}
+                            <span>{getButtonText()}</span>
+                        </div>
                     </Button>
                 )}
 
-                {/* Step 2: Authenticate */}
+                {/* Step 2: Auto-authenticating */}
                 {(step === "connected" || step === "authenticating") && (
-                    <Button
-                        className="mt-8 w-full py-3 border-none"
-                        style={{
-                            background: isConnected && address
-                                ? "linear-gradient(90deg,#65E78C 0%, #A9D7B8 100%)"
-                                : "rgba(169, 215, 184, 0.3)",
-                            color: isConnected && address ? "#05281B" : "#A9D7B8",
-                        }}
-                        onClick={handleAuthenticate}
-                        disabled={loading || step === "authenticating" || !isConnected || !address}
-                    >
-                        {loading && step === "authenticating" ? "Authenticating..." : "Authenticate"}
-                    </Button>
+                    <div className="mt-8 w-full">
+                        <div className="flex items-center justify-center space-x-2 py-3">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#65E78C]"></div>
+                            <span className="text-[#A9D7B8]">
+                                {step === "authenticating" ? "Authenticating..." : "Preparing authentication..."}
+                            </span>
+                        </div>
+                    </div>
                 )}
 
                 {/* Success message */}
                 {step === "done" && (
-                    <div className="mt-8 text-green-100 text-center font-bold text-lg">
-                        Authentication successful! Redirecting...
+                    <div className="mt-8 w-full">
+                        <div className="flex items-center justify-center space-x-2 py-3">
+                            <div className="rounded-full h-4 w-4 bg-green-500 flex items-center justify-center">
+                                <span className="text-white text-xs">✓</span>
+                            </div>
+                            <span className="text-green-100 font-bold">
+                                Authentication successful! Redirecting...
+                            </span>
+                        </div>
                     </div>
                 )}
 
                 <div className="mt-2 text-xs text-[#A9D7B8] text-center opacity-80">
                     Supports MetaMask, WalletConnect, Coinbase Wallet, and other Web3 wallets
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }

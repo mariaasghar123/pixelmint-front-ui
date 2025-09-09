@@ -160,7 +160,7 @@ export default function Header() {
                 <input
                     type="text"
                     placeholder={pathname.startsWith("/admin") ? "Search Users, Transactions..." : "Search Ads, Pixels..."}
-                    className="hidden md:block w-full max-w-md px-4 py-3 rounded-lg bg-dark-700 text-light text-lg focus:outline-none focus:ring-2 focus:ring-green-100"
+                    className="hidden md:block ml-auto w-full max-w-md px-4 py-3 rounded-lg bg-dark-700 text-light text-lg focus:outline-none focus:ring-2 focus:ring-green-100"
                 />
                 <Button className="hidden md:block ml-4 h-full" onClick={() => router.push("/")}>
                     Home

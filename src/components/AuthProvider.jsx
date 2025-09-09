@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
             address,
             isConnected,
             authenticate,
-            adminLogin, // Add admin login function
+            adminLogin, 
             logout,
             connectLoading,
             signLoading,

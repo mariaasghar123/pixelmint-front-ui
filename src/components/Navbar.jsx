@@ -61,7 +61,7 @@ export default function Navbar() {
                             {dropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-44 bg-dark-600 rounded-lg shadow-lg z-10 flex flex-col py-2 border border-border">
                                     <Link
-                                        href="/user"
+                                        href="/user/ads"
                                         className="px-4 py-2 text-light hover:bg-dark-700 hover:text-primary rounded transition"
                                         onClick={() => setDropdownOpen(false)}
                                     >
@@ -151,7 +151,7 @@ export default function Navbar() {
                         ) : (
                             <div className="flex flex-col gap-1 pt-2 mt-2 border-t border-border">
                                 <Link
-                                    href="/user"
+                                    href="/user/ads"
                                     className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
                                         ${(pathname === "/user") ? "bg-green-100/20 font-semibold text-green-100" : ""}
                                         hover:bg-dark-600 hover:text-green-200`}

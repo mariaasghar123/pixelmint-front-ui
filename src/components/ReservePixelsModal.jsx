@@ -8,6 +8,15 @@ function formatCoords(coord) {
     return Math.floor(coord / 10)
 }
 
+function formatPrice(price) {
+    return price.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })
+}
+
 export default function ReservePixelsModal({ open, onClose, coords, onConfirmed }) {
     const [loading, setLoading] = useState(false)
 
@@ -49,7 +58,7 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
                     </div>
                     <div className="flex justify-between col-span-2 pt-2 border-t border-border">
                         <span className="text-green-100 font-semibold">Price:</span>
-                        <span className="text-green-200 font-mono font-bold text-lg">${price.toFixed(2)}</span>
+                        <span className="text-green-200 font-mono font-bold text-lg">{formatPrice(price)}</span>
                     </div>
                 </div>
                 <div className="text-green-100/70 text-xs text-center mt-2">Rate: $1 per pixel</div>

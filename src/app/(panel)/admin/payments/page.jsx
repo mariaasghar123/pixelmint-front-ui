@@ -1,170 +1,164 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
 import SearchFilterBar from "@/components/Panel/SearchFilterBar";
 import Table from "@/components/Panel/Table";
-import { CircleCheck, MoreVertical, Clock, CircleX } from "lucide-react";
+import { CircleCheck, MoreVertical, Clock, CircleX, ExternalLink } from "lucide-react";
+import { formatDateTime } from "@/utils/date.utils";
+import api from "@/lib/api";
 
-const tableData = [
-    {
-        transaction: "TXN-2024-001",
-        date: "1/15/2024",
-        time: "7:30:00 PM",
-        user: { name: "Sarah Johnson", email: "sarah@example.com" },
-        amount: "2,500",
-        status: "Completed",
-    },
-    {
-        transaction: "TXN-2024-002",
-        date: "1/16/2024",
-        time: "9:15:00 AM",
-        user: { name: "Mike Chen", email: "mike@example.com" },
-        amount: "1,000",
-        status: "Completed",
-    },
-    {
-        transaction: "TXN-2024-003",
-        date: "1/17/2024",
-        time: "2:20:00 PM",
-        user: { name: "Lisa Wang", email: "lisa@example.com" },
-        amount: "3,200",
-        status: "Pending",
-    },
-    {
-        transaction: "TXN-2024-004",
-        date: "1/18/2024",
-        time: "5:45:00 PM",
-        user: { name: "Emily Davis", email: "emily@example.com" },
-        amount: "1,500",
-        status: "Failed",
-    },
-    {
-        transaction: "TXN-2024-005",
-        date: "1/19/2024",
-        time: "10:05:00 AM",
-        user: { name: "Alex Rodriguez", email: "alex@example.com" },
-        amount: "2,750",
-        status: "Completed",
-    },
-    {
-        transaction: "TXN-2024-006",
-        date: "1/20/2024",
-        time: "4:10:00 PM",
-        user: { name: "John Smith", email: "john@example.com" },
-        amount: "800",
-        status: "Pending",
-    },
-    {
-        transaction: "TXN-2024-007",
-        date: "1/21/2024",
-        time: "11:55:00 AM",
-        user: { name: "Olivia Brown", email: "olivia@example.com" },
-        amount: "2,300",
-        status: "Completed",
-    },
-    {
-        transaction: "TXN-2024-008",
-        date: "1/22/2024",
-        time: "6:40:00 PM",
-        user: { name: "David Lee", email: "david@example.com" },
-        amount: "950",
-        status: "Failed",
-    },
-    {
-        transaction: "TXN-2024-009",
-        date: "1/23/2024",
-        time: "3:10:00 PM",
-        user: { name: "Nina Patel", email: "nina@example.com" },
-        amount: "1,800",
-        status: "Completed",
-    },
-    {
-        transaction: "TXN-2024-010",
-        date: "1/24/2024",
-        time: "8:25:00 AM",
-        user: { name: "Mohamed Ali", email: "mohamed@example.com" },
-        amount: "2,600",
-        status: "Completed",
-    },
-];
+export default function PaymentManagementPage() {
+    const [searchTerm, setSearchTerm] = useState("");
 
-const columns = [
-    {
-        header: "Transaction",
-        key: "transaction",
-        render: (row) => (
-            <div>
-                <div className="font-semibold text-white">{row.transaction}</div>
-                <div className="text-light/40 text-sm">{row.date} at {row.time}</div>
-            </div>
-        ),
-    },
-    {
-        header: "User",
-        key: "user",
-        render: (row) => (
-            <div>
-                <div className="font-semibold text-white">{row.user.name}</div>
-                <div className="text-light/40 text-sm">{row.user.email}</div>
-            </div>
-        ),
-    },
-    {
-        header: "Amount (USDT)",
-        key: "amount",
-        render: (row) => (
-            <div className="text-white">{row.amount}</div>
-        ),
-    },
-    {
-        header: "Status",
-        key: "status",
-        render: (row) => {
-            if (row.status === "Completed") {
-                return (
-                    <span className="rounded-full px-3 py-1 font-medium text-sm flex items-center gap-2 bg-green-200 text-dark-800">
-                        <CircleCheck size={16} /> Completed
-                    </span>
-                );
-            }
-            if (row.status === "Pending") {
-                return (
-                    <span className="rounded-full px-3 py-1 font-medium text-sm flex items-center gap-2 bg-yellow-200 text-yellow-900">
-                        <Clock size={16} /> Pending
-                    </span>
-                );
-            }
-            if (row.status === "Failed") {
-                return (
-                    <span className="rounded-full px-3 py-1 font-medium text-sm flex items-center gap-2 bg-red-200 text-red-900">
-                        <CircleX size={16} /> Failed
-                    </span>
-                );
-            }
-            return null;
+    const { data, isLoading, error } = useQuery({
+        queryKey: ["payments"],
+        queryFn: async () => {
+            const res = await api.get("/payments");
+            return res.data.payload;
         },
-    },
-    {
-        header: "Actions",
-        key: "actions",
-        render: () => (
-            <button className="bg-dark-800 p-2 rounded-lg hover:bg-white/5 flex items-center justify-center"
-                style={{
-                    background: "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
-                }}>
-                <MoreVertical className="text-light w-5 h-5" />
-            </button>
-        ),
-    },
-];
+    });
 
-export default function Page() {
+    const columns = [
+        {
+            header: "Transaction",
+            key: "transaction",
+            render: (row) => (
+                <div>
+                    <div className="font-semibold text-white truncate max-w-[200px]">{row.transaction}</div>
+                    <div className="text-light/40 text-sm">{row.date} at {row.time}</div>
+                </div>
+            ),
+        },
+        {
+            header: "User",
+            key: "user",
+            render: (row) => (
+                <div>
+                    <div className="font-semibold text-white">{row.user.name}</div>
+                    <div className="text-light/40 text-sm">{row.user.email}</div>
+                </div>
+            ),
+        },
+        {
+            header: "Amount (USDT)",
+            key: "amount",
+            render: (row) => (
+                <div className="text-white">{row.amount.toLocaleString()}</div>
+            ),
+        },
+        {
+            header: "Status",
+            key: "status",
+            render: (row) => {
+                if (row.status === "confirmed") {
+                    return (
+                        <span className="rounded-full px-3 py-1 font-medium text-sm flex items-center gap-2 bg-green-200 text-dark-800">
+                            <CircleCheck size={16} /> Confirmed
+                        </span>
+                    );
+                }
+                if (row.status === "pending") {
+                    return (
+                        <span className="rounded-full px-3 py-1 font-medium text-sm flex items-center gap-2 bg-yellow-200 text-yellow-900">
+                            <Clock size={16} /> Pending
+                        </span>
+                    );
+                }
+                if (row.status === "failed") {
+                    return (
+                        <span className="rounded-full px-3 py-1 font-medium text-sm flex items-center gap-2 bg-red-200 text-red-900">
+                            <CircleX size={16} /> Failed
+                        </span>
+                    );
+                }
+                return null;
+            },
+        },
+        {
+            header: "Actions",
+            key: "actions",
+            render: (row) => (
+                <div className="flex gap-2">
+                    {row.transactionHash && (
+                        <a
+                            href={`https://etherscan.io/tx/${row.transactionHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-dark-800 p-2 rounded-lg hover:bg-white/5 flex items-center justify-center"
+                            title="View on Etherscan"
+                            style={{
+                                background: "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
+                            }}
+                        >
+                            <ExternalLink className="text-light w-5 h-5" />
+                        </a>
+                    )}
+                    {/* <button */}
+                    {/*     className="bg-dark-800 p-2 rounded-lg hover:bg-white/5 flex items-center justify-center" */}
+                    {/*     style={{ */}
+                    {/*         background: "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)" */}
+                    {/*     }} */}
+                    {/* > */}
+                    {/*     <MoreVertical className="text-light w-5 h-5" /> */}
+                    {/* </button> */}
+                </div>
+            ),
+        },
+    ];
+
+    const tableData = useMemo(() => {
+        return (data || []).map((item) => {
+            const { date, time } = formatDateTime(item.createdAt);
+
+            return {
+                id: item._id,
+                transaction: item.transactionHash || `Payment ID: ${item._id.slice(0, 8)}...`,
+                transactionHash: item.transactionHash,
+                date,
+                time,
+                user: {
+                    name: item.user?.fullName || "Unknown User",
+                    email: item.user?.email || "N/A",
+                    wallet: item.user?.walletAddress || "N/A"
+                },
+                amount: item.amount,
+                status: item.status,
+            };
+        });
+    }, [data]);
+
+    const filteredTableData = useMemo(() => {
+        if (!searchTerm) return tableData;
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+
+        return tableData.filter(row =>
+            row.transaction?.toLowerCase().includes(lowerSearchTerm) ||
+            row.user.name.toLowerCase().includes(lowerSearchTerm) ||
+            row.user.email.toLowerCase().includes(lowerSearchTerm) ||
+            row.user.wallet.toLowerCase().includes(lowerSearchTerm) ||
+            String(row.amount).includes(lowerSearchTerm)
+        );
+    }, [searchTerm, tableData]);
+
     return (
         <main className="mt-5">
             <div>
                 <h1 className="font-bold text-2xl">Transaction Management</h1>
-                <p className="text-light/60">View and manage user transactions</p>
+                <p className="text-light/60">View and manage blockchain payment transactions</p>
             </div>
-            <SearchFilterBar className="mt-3 mb-5" />
-            <Table columns={columns} data={tableData} />
+            <SearchFilterBar
+                className="mt-3 mb-5"
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                placeholder="Search by transaction ID, user, or amount..."
+            />
+            <Table
+                columns={columns}
+                data={filteredTableData}
+                isLoading={isLoading}
+            />
+            {error && <div className="text-red-500 mt-4">Failed to load payment data.</div>}
         </main>
     );
 }

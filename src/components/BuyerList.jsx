@@ -28,6 +28,29 @@ const buyerMedals = ["/1st.png", "/2nd.png", "/3rd.png", "/4th.png", "/4th.png"]
 const defaultGradient = "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
 const defaultBorder = "rgba(192, 192, 192, 0.3)"
 
+const SkeletonCard = ({ showColors = true, index = 0 }) => (
+    <div
+        className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
+        style={{
+            background: showColors ? buyerGradients[index] || defaultGradient : defaultGradient,
+            border: `0.5px solid ${showColors ? buyerBorders[index] || defaultBorder : defaultBorder}`,
+        }}
+    >
+        <div className="flex justify-between items-start w-full">
+            <div className="w-16 h-16 rounded-md bg-gray-700 animate-pulse"></div>
+
+            {showColors && (
+                <div className="w-8 h-12 mt-1 bg-gray-700 animate-pulse"></div>
+            )}
+        </div>
+        <div className="flex flex-col gap-1 w-full">
+            <div className="h-6 w-3/4 bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-4 w-1/2 bg-gray-700/60 rounded mt-1 animate-pulse"></div>
+            <div className="h-4 w-full bg-gray-700/60 rounded mt-1 animate-pulse"></div>
+        </div>
+    </div>
+)
+
 export default function BuyerList({
     title = "Recent buyers",
     buyers,
@@ -35,8 +58,11 @@ export default function BuyerList({
     iconColor = "#FFFFFF",
     showColors = true,
 }) {
-
     const Icon = iconMap[icon] || FaCrown
+    const isLoading = !buyers || buyers.length === 0
+
+    // Create an array of 5 skeleton cards when loading
+    const skeletonCards = Array(5).fill(0).map((_, i) => ({ id: `skeleton-${i}`, index: i }))
 
     return (
         <section className="w-full rounded-lg overflow-hidden" style={{ border: `0.5px solid ${defaultBorder}` }}>
@@ -69,10 +95,64 @@ export default function BuyerList({
                         }}
                         className="buyer-swiper"
                     >
-                        {buyers?.map((buyer, i) => (
-                            <SwiperSlide key={i} className="!w-full">
+                        {isLoading
+                            ? skeletonCards.map((card) => (
+                                <SwiperSlide key={card.id} className="!w-full">
+                                    <SkeletonCard showColors={showColors} index={card.index} />
+                                </SwiperSlide>
+                            ))
+                            : buyers.map((buyer, i) => (
+                                <SwiperSlide key={i} className="!w-full">
+                                    <div
+                                        className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
+                                        style={{
+                                            background: showColors ? buyerGradients[i] || defaultGradient : defaultGradient,
+                                            border: `0.5px solid ${showColors ? buyerBorders[i] || defaultBorder : defaultBorder}`,
+                                        }}
+                                    >
+                                        <div className="flex justify-between items-start w-full">
+                                            <Image
+                                                src={buyer.avatar || "/shopverse.png"}
+                                                alt={buyer.adTitle || 'buyer image'}
+                                                width={64}
+                                                height={64}
+                                                className="rounded-md object-cover"
+                                            />
+
+                                            {showColors && (
+                                                <Image
+                                                    className="mt-1"
+                                                    src={buyerMedals[i] || "/shopverse.png"}
+                                                    alt={buyer.displayName || 'buyer image'}
+                                                    width={32}
+                                                    height={51}
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <div className="font-semibold text-lg font-sans underline">{buyer.displayName || 'Shopverse'}</div>
+                                            <div className="text-light/60 font-sans text-sm">Bought: {buyer.purchaseArea || '404'}</div>
+                                            <div className="text-light/60 font-sans text-sm">
+                                                Position: {`((${buyer?.purchasePosition?.topLeft || '--,--'}), (${buyer?.purchasePosition?.bottomRight || '--,--'}))`}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SwiperSlide>
+                            ))
+                        }
+                    </Swiper>
+                </div>
+
+                <div className="hidden lg:block">
+                    <div className="grid grid-cols-5 gap-6">
+                        {isLoading
+                            ? skeletonCards.map((card) => (
+                                <SkeletonCard key={card.id} showColors={showColors} index={card.index} />
+                            ))
+                            : buyers.map((buyer, i) => (
                                 <div
-                                    className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
+                                    key={i}
+                                    className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3")}
                                     style={{
                                         background: showColors ? buyerGradients[i] || defaultGradient : defaultGradient,
                                         border: `0.5px solid ${showColors ? buyerBorders[i] || defaultBorder : defaultBorder}`,
@@ -81,7 +161,7 @@ export default function BuyerList({
                                     <div className="flex justify-between items-start w-full">
                                         <Image
                                             src={buyer.avatar || "/shopverse.png"}
-                                            alt={buyer.adTitle}
+                                            alt={buyer.adTitle || 'buyer image'}
                                             width={64}
                                             height={64}
                                             className="rounded-md object-cover"
@@ -91,68 +171,25 @@ export default function BuyerList({
                                             <Image
                                                 className="mt-1"
                                                 src={buyerMedals[i] || "/shopverse.png"}
-                                                alt={buyer.displayName}
+                                                alt={buyer.displayName || 'buyer image'}
                                                 width={32}
                                                 height={51}
                                             />
                                         )}
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <div className="font-semibold text-lg font-sans underline">{buyer.displayName || 'Shopverse'}</div>
-                                        <div className="text-light/60 font-sans text-sm">Bought: {buyer.purchaseArea || '404'}</div>
+                                        <div className="font-semibold text-lg font-sans underline">{buyer?.displayName || 'User'}</div>
+                                        <div className="text-light/60 font-sans text-sm">Bought: {buyer?.purchaseArea || 0}</div>
                                         <div className="text-light/60 font-sans text-sm">
                                             Position: {`((${buyer?.purchasePosition?.topLeft || '--,--'}), (${buyer?.purchasePosition?.bottomRight || '--,--'}))`}
                                         </div>
                                     </div>
                                 </div>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                </div>
-
-                <div className="hidden lg:block">
-                    <div className="grid grid-cols-5 gap-6">
-                        {buyers?.map((buyer, i) => (
-                            <div
-                                key={i}
-                                className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3")}
-                                style={{
-                                    background: showColors ? buyerGradients[i] || defaultGradient : defaultGradient,
-                                    border: `0.5px solid ${showColors ? buyerBorders[i] || defaultBorder : defaultBorder}`,
-                                }}
-                            >
-                                <div className="flex justify-between items-start w-full">
-                                    <Image
-                                        src={buyer.avatar || "/shopverse.png"}
-                                        alt={buyer.adTitle}
-                                        width={64}
-                                        height={64}
-                                        className="rounded-md object-cover"
-                                    />
-
-                                    {showColors && (
-                                        <Image
-                                            className="mt-1"
-                                            src={buyerMedals[i] || "/shopverse.png"}
-                                            alt={buyer.displayName}
-                                            width={32}
-                                            height={51}
-                                        />
-                                    )}
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <div className="font-semibold text-lg font-sans underline">{buyer?.displayName || 'User'}</div>
-                                    <div className="text-light/60 font-sans text-sm">Bought: {buyer?.purchaseArea || 0}</div>
-                                    <div className="text-light/60 font-sans text-sm">
-                                        Position: {`((${buyer?.purchasePosition?.topLeft || '--,--'}), (${buyer?.purchasePosition?.bottomRight || '--,--'}))`}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        }
                     </div>
                 </div>
             </div>
         </section>
     )
 }
-

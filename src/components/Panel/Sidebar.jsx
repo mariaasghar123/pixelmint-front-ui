@@ -4,11 +4,11 @@ import { usePathname } from "next/navigation";
 import { FaHome, FaChartBar, FaSearch, FaRegCreditCard, FaCog, FaUser, FaUserAlt, FaUsers } from "react-icons/fa";
 
 const userTabs = [
-    {
-        name: "Your Pixels",
-        icon: FaHome,
-        path: "/user",
-    },
+    // {
+    //     name: "Your Pixels",
+    //     icon: FaHome,
+    //     path: "/user",
+    // },
     {
         name: "My Ads",
         icon: FaChartBar,

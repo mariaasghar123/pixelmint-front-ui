@@ -11,13 +11,14 @@ import { useAuth } from "./AuthProvider"
 import { useRouter } from "next/navigation"
 import api from "@/lib/api"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import PaymentModal from "./PaymentModal"
+import PurchasePopover from "./PurchasePopover"
 
 const COLOR_GRID = "#FFFFFF2A"
 const COLOR_PROP_SHAPE = "#E44A4A"
 const COLOR_DRAW_PREVIEW = "#31AF99"
 const COLOR_RESERVATION = "#3b82f6"
 const BorderWidth = 2
-const shopverseImg = "/shopverse.png"
 const TOTAL_WIDTH = 1250
 const TOTAL_HEIGHT = 750
 const BLOCK_SIZE = 5
@@ -37,6 +38,9 @@ const MAX_MAGNIFIER_ZOOM = 20
 
 // Click-to-zoom settings
 const CLICK_ZOOM_LEVELS = [5, 10, 15, 20]
+
+// Pan delay settings
+const PAN_DELAY_MS = 250
 
 function formatCoordsArr(coordArr) {
     const formatted = [Math.floor(Math.ceil(coordArr[0] / 5) * 5 / BLOCK_SIZE), Math.floor((coordArr[1] / 5) * 5 / BLOCK_SIZE)]
@@ -122,12 +126,21 @@ export default function PixelGridCanvas() {
     const [isFullscreen, toggleFullscreen] = useToggleFullscreen(canvasContainerRef)
     const { user: isAuthenticated } = useAuth()
 
+    const [showPaymentModal, setShowPaymentModal] = useState(false)
+    const [showPurchasePopover, setShowPurchasePopover] = useState(false)
+
     // Magnifying glass states
     const [magnifierActive, setMagnifierActive] = useState(false)
     const [magnifierPos, setMagnifierPos] = useState({ x: 0, y: 0 })
     const [magnifierZoom, setMagnifierZoom] = useState(MAGNIFIER_ZOOM)
     const [isMobile, setIsMobile] = useState(false)
     const [clickZoomLevel, setClickZoomLevel] = useState(0)
+
+    // Pan delay states
+    const [mouseDownTime, setMouseDownTime] = useState(null)
+    const [panDelayTimeout, setPanDelayTimeout] = useState(null)
+    const [shouldPreventZoom, setShouldPreventZoom] = useState(false)
+    const [pendingMouseEvent, setPendingMouseEvent] = useState(null)
 
     const [activeReservation, setActiveReservation] = useState(() => {
         const reservations = getReservation()
@@ -154,15 +167,27 @@ export default function PixelGridCanvas() {
 
     useEffect(() => {
         const reservations = getReservation()
-        setActiveReservation(reservations ? reservations : null)
-        setActiveReservationId(reservations ? reservations?.reservationId : null)
-        if (reservations && drawing) {
+        const currentReservation = reservations
+        console.log(reservations)
+
+        setActiveReservation(currentReservation)
+        setActiveReservationId(currentReservation?.reservationId)
+
+        if (currentReservation?.purchaseId) {
+            setShowPurchasePopover(true)
+            setShowReservedPopover(false)
+
+        } else if (currentReservation?.reservationId) {
+            setShowPurchasePopover(false)
+            setShowReservedPopover(true)
+        }
+
+        if (currentReservation) {
             const coords = {
                 topLeft: reservations.topLeft,
                 bottomRight: reservations.bottomRight,
             }
             setModalCoords(coords)
-            setShowReservedPopover(true)
         }
     }, [drawing])
 
@@ -220,6 +245,15 @@ export default function PixelGridCanvas() {
     useEffect(() => {
         fetchReservations()
     }, [])
+
+    // Clean up pan delay timeout
+    useEffect(() => {
+        return () => {
+            if (panDelayTimeout) {
+                clearTimeout(panDelayTimeout)
+            }
+        }
+    }, [panDelayTimeout])
 
     // Responsive scaling
     useEffect(() => {
@@ -680,6 +714,12 @@ export default function PixelGridCanvas() {
 
     // Handle wheel event for zooming
     function handleWheel(e) {
+        // Prevent zoom if currently panning or should prevent zoom
+        if (panning || shouldPreventZoom) {
+            e.preventDefault()
+            return
+        }
+
         if (magnifierActive && !isMobile) {
             e.preventDefault()
             // Zoom the magnifier
@@ -816,8 +856,8 @@ export default function PixelGridCanvas() {
                     bottomRight: [x2, y2],
                 };
 
-                const width = Math.abs(x2 - x1) + 1;
-                const height = Math.abs(y2 - y1) + 1;
+                const width = Math.abs(x2 - x1);
+                const height = Math.abs(y2 - y1);
                 const area = width * height;
 
                 if (area < 4) {
@@ -896,6 +936,7 @@ export default function PixelGridCanvas() {
             return;
         }
 
+        // Handle explicit pan mode (middle mouse or ctrl+click)
         if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
             setPanning(true)
             setPanStart({
@@ -906,7 +947,33 @@ export default function PixelGridCanvas() {
             })
             return
         }
-        if (!canDraw) return
+
+        // Store mouse down time for pan delay logic
+        const currentTime = Date.now()
+        setMouseDownTime(currentTime)
+        setShouldPreventZoom(false)
+        setPendingMouseEvent(e)
+
+        // For non-drawing mode, allow immediate panning
+        if (!canDraw) {
+            setPanning(true)
+            setPanStart({
+                x: e.clientX,
+                y: e.clientY,
+                ox: offset.x,
+                oy: offset.y,
+            })
+
+            // Set up timeout to prevent zoom if movement starts within delay
+            const timeout = setTimeout(() => {
+                setShouldPreventZoom(false)
+                setPendingMouseEvent(null)
+            }, PAN_DELAY_MS)
+            setPanDelayTimeout(timeout)
+            return
+        }
+
+        // For drawing mode, start drawing immediately
         const pixelPos = getPixelFromMouse(e)
         setMousePixelPos(pixelPos)
         setDrawing(true)
@@ -924,6 +991,26 @@ export default function PixelGridCanvas() {
         // Update magnifier position
         if (!isMobile && magnifierActive) {
             setMagnifierPos({ x: e.clientX, y: e.clientY });
+        }
+
+        // If mouse moved and we're within the pan delay period, start panning
+        if (mouseDownTime && !panning && !drawing && (Date.now() - mouseDownTime) < PAN_DELAY_MS) {
+            setShouldPreventZoom(true)
+
+            if (panDelayTimeout) {
+                clearTimeout(panDelayTimeout)
+                setPanDelayTimeout(null)
+            }
+
+            if (!canDraw && pendingMouseEvent) {
+                setPanning(true)
+                setPanStart({
+                    x: pendingMouseEvent.clientX,
+                    y: pendingMouseEvent.clientY,
+                    ox: offset.x,
+                    oy: offset.y,
+                })
+            }
         }
 
         if (drawing) {
@@ -947,11 +1034,27 @@ export default function PixelGridCanvas() {
 
     async function handleMouseUp(e) {
         e.preventDefault()
+
+        // Clean up pan delay state
+        if (panDelayTimeout) {
+            clearTimeout(panDelayTimeout)
+            setPanDelayTimeout(null)
+        }
+
+        setMouseDownTime(null)
+        setPendingMouseEvent(null)
+
+        // Reset prevent zoom after a short delay to allow wheel events to process normally
+        setTimeout(() => {
+            setShouldPreventZoom(false)
+        }, 50)
+
         if (panning) {
             setPanning(false)
             setPanStart(null)
             return
         }
+
         if (drawing && canDraw && startBlock && endBlock) {
             const x1 = Math.min(startBlock[0], endBlock[0])
             const y1 = Math.min(startBlock[1], endBlock[1])
@@ -963,8 +1066,8 @@ export default function PixelGridCanvas() {
                 bottomRight: [x2, y2],
             }
 
-            const width = Math.abs(x2 - x1) + 1
-            const height = Math.abs(y2 - y1) + 1
+            const width = Math.abs(x2 - x1)
+            const height = Math.abs(y2 - y1)
             const area = width * height
 
             if (area < 4) {
@@ -1014,7 +1117,6 @@ export default function PixelGridCanvas() {
     function handleCanDrawToggle() {
         setCanDraw((prev) => !prev)
         setDrawing((p) => !p)
-        if (activeReservation) setShowReservedPopover((p) => !p)
         setStartBlock(null)
         setEndBlock(null)
     }
@@ -1038,6 +1140,7 @@ export default function PixelGridCanvas() {
 
     async function handleCancelTransaction() {
         setShowReservedPopover(false)
+        setShowPurchasePopover(false)
         if (activeReservationId) {
             await deleteReservation(activeReservationId)
         }
@@ -1057,11 +1160,12 @@ export default function PixelGridCanvas() {
 
     function handleCompleteModalClose() {
         setShowCompleteModal(false)
-        clearReservation()
-        setActiveReservation(null)
-        setActiveReservationId(null)
-    }
 
+        if (getReservation()) {
+            setShowPurchasePopover(true)
+            setShowReservedPopover(false)
+        }
+    }
     function handleReserveModalClose() {
         setShowReserveModal(false)
         clearReservation()
@@ -1069,11 +1173,17 @@ export default function PixelGridCanvas() {
         setActiveReservationId(null)
     }
 
+    function handleContinueToPayment() {
+        setShowPurchasePopover(false)
+        setShowPaymentModal(true)
+    }
+
     // Determine cursor style
     function getCursorStyle() {
         if (panning) return "grab"
         if (magnifierActive && !isMobile) return "none"
         if (drawing && canDraw) return "crosshair"
+        if (!canDraw) return "grab" // Show grab cursor in non-drawing mode
         return "pointer"
     }
 
@@ -1143,6 +1253,12 @@ export default function PixelGridCanvas() {
                 onCancel={handleCancelTransaction}
                 onContinue={handleContinueTransaction}
             />
+            <PurchasePopover
+                coords={modalCoords}
+                open={showPurchasePopover}
+                onContinuePayment={handleContinueToPayment}
+                onCancel={handleCancelTransaction}
+            />
             <ReservePixelsModal
                 open={showReserveModal}
                 onClose={handleReserveModalClose}
@@ -1152,6 +1268,14 @@ export default function PixelGridCanvas() {
             <CompleteTransactionModal
                 open={showCompleteModal}
                 onClose={handleCompleteModalClose}
+            />
+            <PaymentModal
+                open={showPaymentModal}
+                onClose={() => {
+                    setShowPaymentModal(false);
+                    setActiveReservation(null);
+                    setActiveReservationId(null)
+                }}
             />
         </div>
     )

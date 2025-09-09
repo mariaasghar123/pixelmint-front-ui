@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MdClose } from "react-icons/md";
 import Button from "./ui/Button";
-import { clearReservation, getReservation } from "@/utils/localStorage.utils";
+import { clearReservation, getReservation, saveReservation } from "@/utils/localStorage.utils";
 import ImageUploadBox from "./ui/ImageUpload";
 import Input from "./ui/Input";
 import { adModalSchema } from "@/schemas/ad.schema";
@@ -36,9 +36,15 @@ export default function CompleteTransactionModal({ open, onClose }) {
     const createPurchase = useMutation({
         mutationFn: purchasePixelMutation,
         onSuccess: (data) => {
-            if (data?.success === true) {
-                toast.success('Pixel purchase successful!');
-                handleClose();
+            console.log(status)
+            if (data.success === true) {
+                // toast.success('Pixel purchase successful!');
+                saveReservation({
+                    ...reservation,
+                    purchaseId: data.payload._id
+                })
+                reset()
+                onClose();
             } else {
                 toast.error(data?.message || 'Pixel purchase failed!');
             }
@@ -50,12 +56,28 @@ export default function CompleteTransactionModal({ open, onClose }) {
 
     function handleClose() {
         reset()
-        clearReservation();
         onClose();
     }
 
     function onFormSubmit(data) {
-        createPurchase.mutate({ ...data, pixelArea: reservation })
+        let reservedAt = null;
+        if (reservation && reservation.reservationId) {
+            try {
+                const timestampStr = reservation.reservationId.split('-')[0];
+                const timestamp = parseInt(timestampStr, 10);
+                if (!isNaN(timestamp)) {
+                    reservedAt = new Date(timestamp).toISOString();
+                }
+            } catch (error) {
+                console.error("Error parsing reservation timestamp:", error);
+            }
+        }
+
+        createPurchase.mutate({
+            ...data,
+            pixelArea: reservation,
+            reservedAt: reservedAt
+        });
     }
 
     if (!open) return null;
@@ -130,8 +152,12 @@ export default function CompleteTransactionModal({ open, onClose }) {
                         )}
                     </div>
 
-                    <Button type="submit" className="w-full">
-                        Place Your Ad
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={createPurchase.isPending}
+                    >
+                        {createPurchase.isPending ? 'Processing...' : 'Place Your Ad'}
                     </Button>
                     {isSubmitted && Object.keys(errors).length > 0 && (
                         <div className="text-error text-sm mt-2">

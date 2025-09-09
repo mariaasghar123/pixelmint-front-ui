@@ -160,16 +160,14 @@ function TopBar({
                                     <FaSearchPlus size={16} className="w-5 h-5" />
                                 </button>
 
-                                {isZoomed && (
-                                    <button
-                                        className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
-                                        title="Reset Zoom"
-                                        onClick={onResetZoom}
-                                        style={{ color: "#fff" }}
-                                    >
-                                        <FaSearchMinus size={16} className="w-5 h-5" />
-                                    </button>
-                                )}
+                                <button
+                                    className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                                    title="Reset Zoom"
+                                    onClick={onResetZoom}
+                                    style={{ color: "#fff" }}
+                                >
+                                    <FaSearchMinus size={16} className="w-5 h-5" />
+                                </button>
 
                                 {magnifierActive && (
                                     <>

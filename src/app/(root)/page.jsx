@@ -81,7 +81,6 @@ export default function Home() {
         },
     ]
 
-
     return (
         <main className="w-[90%] mx-auto flex flex-col gap-6 my-6">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
@@ -92,7 +91,7 @@ export default function Home() {
             <PixelCanvas />
             <BuyerList title="Biggest Buyers" buyers={topBuyers?.length !== 0 ? topBuyers : buyers} iconColor="#FF9900" />
             <BuyerList buyers={recentBuyers?.length !== 0 ? recentBuyers : buyers} showColors={false} icon="FaClock" />
-            <BuyerList title="Our Clients" buyers={buyers} showColors={false} icon="FaUsers" />
+            {/* <BuyerList title="Our Clients" buyers={buyers} showColors={false} icon="FaUsers" /> */}
             <StayConnected />
         </main>
     )
