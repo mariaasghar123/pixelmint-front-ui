@@ -48,7 +48,7 @@ export default function Home() {
     const { data: topBuyers } = useQuery({
         queryKey: ['top-buyers'],
         queryFn: async () => {
-            const data = await api.get("/user/top-area-buyers")
+            const data = await api.get("/user/buyers/area")
             return data.data.payload
         }
     })
@@ -56,7 +56,7 @@ export default function Home() {
     const { data: recentBuyers } = useQuery({
         queryKey: ['recent-buyers'],
         queryFn: async () => {
-            const data = await api.get("/user/top-recent-buyers")
+            const data = await api.get("/user/buyers/recent")
             return data.data.payload
         }
     })
