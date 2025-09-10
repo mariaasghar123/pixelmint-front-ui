@@ -8,6 +8,7 @@ export async function purchasePixelMutation(data) {
     formData.append('displayName', data.displayName);
     formData.append('adTitle', data.adTitle);
     formData.append('websiteUrl', data.websiteUrl);
+    formData.append('reservationId', data.reservationId)
     formData.append('reservedAt', data.reservedAt)
 
     if (data.telegramContact) formData.append('telegramContact', data.telegramContact);

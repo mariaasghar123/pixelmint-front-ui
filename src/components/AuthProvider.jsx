@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
         queryFn: async () => {
             try {
                 const res = await api.get("/auth/status");
+                console.log(res.data.payload)
                 return res.data.payload;
             } catch (err) { }
             return null;
@@ -125,7 +126,7 @@ export const AuthProvider = ({ children }) => {
             address,
             isConnected,
             authenticate,
-            adminLogin, 
+            adminLogin,
             logout,
             connectLoading,
             signLoading,

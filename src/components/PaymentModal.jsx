@@ -231,6 +231,7 @@ export default function PaymentModal({
     const [errorType, setErrorType] = useState(ERROR_TYPES.UNKNOWN);
     const [hasInitiated, setHasInitiated] = useState(false);
     const [isErrorHandling, setIsErrorHandling] = useState(false);
+    const [verificationData, setVerificationData] = useState(null);
 
     // Refs for preventing duplicate calls
     const initiateCallInProgress = useRef(false);
@@ -380,7 +381,9 @@ export default function PaymentModal({
         setPaymentState(PAYMENT_STATES.INITIATING);
 
         try {
-            const purchaseId = getReservation().purchaseId;
+            const reservation = getReservation();
+            const purchaseId = reservation.purchaseId;
+
             if (!purchaseId) {
                 handleError("Reservation not found. Please try again.", ERROR_TYPES.PURCHASE_ID);
                 initiateCallInProgress.current = false;
@@ -402,7 +405,16 @@ export default function PaymentModal({
                 amount: result.payment.amount,
                 nonce: result.payment.nonce
             });
-            setPaymentId(result.payment._id);
+
+            // Save payment ID in state AND in reservation
+            const paymentIdValue = result.payment._id;
+            setPaymentId(paymentIdValue);
+
+            // Update reservation with payment details
+            saveReservation({
+                ...reservation,
+                paymentId: paymentIdValue
+            });
 
             // Reset the in-progress flag
             initiateCallInProgress.current = false;
@@ -439,7 +451,16 @@ export default function PaymentModal({
         // Admin users don't need to sign
         if (isAdmin) {
             // Generate a mock signature for admin
-            setSignedNonce(`admin-signature-${Date.now()}`);
+            const adminSignature = `admin-signature-${Date.now()}`;
+            setSignedNonce(adminSignature);
+
+            // Update reservation with the admin signature
+            const reservation = getReservation();
+            saveReservation({
+                ...reservation,
+                signedNonce: adminSignature
+            });
+
             setPaymentState(PAYMENT_STATES.READY);
             return;
         }
@@ -461,29 +482,84 @@ export default function PaymentModal({
 
         // Create a mock signature if needed
         if (!signedNonce) {
-            setSignedNonce(`admin-signature-${Date.now()}`);
+            const adminSignature = `admin-signature-${Date.now()}`;
+            setSignedNonce(adminSignature);
+
+            // Update reservation with admin signature
+            const reservation = getReservation();
+            saveReservation({
+                ...reservation,
+                signedNonce: adminSignature
+            });
         }
+
+        // Ensure we have the payment ID
+        const reservation = getReservation();
+        const storedPaymentId = reservation.paymentId || paymentId;
+
+        if (storedPaymentId && !paymentId) {
+            setPaymentId(storedPaymentId);
+        }
+
+        // Prepare verification data
+        const verificationInfo = {
+            txHash: adminTxHash,
+            paymentId: storedPaymentId || paymentId,
+            signedNonce: signedNonce || reservation.signedNonce,
+            networkId
+        };
+
+        setVerificationData(verificationInfo);
 
         // Move to verification step
         setPaymentState(PAYMENT_STATES.VERIFYING);
 
-        // Trigger verification after a short delay
+        // Trigger verification after a short delay to ensure state updates are processed
         setTimeout(() => {
-            verifyPayment(adminTxHash, networkId);
+            verifyPayment(verificationInfo);
         }, 500);
-    }, [signedNonce]);
+    }, [signedNonce, paymentId]);
 
     // 3. VERIFY PAYMENT - Verify the payment with backend
-    const verifyPayment = useCallback(async (adminTxHash, adminNetworkId) => {
+    const verifyPayment = useCallback(async (verificationInfo = null) => {
         // Prevent duplicate verification calls
         if (verifyCallInProgress.current) return;
         verifyCallInProgress.current = true;
 
-        // Use provided admin values or the component state
-        const transactionHash = adminTxHash || txHash;
-        const networkId = adminNetworkId || selectedNetworkId;
+        // Use provided verification info or get from state/localStorage
+        let transactionHash, networkId, currentPaymentId, currentSignedNonce;
 
-        if (!transactionHash || !signedNonce || !paymentId) {
+        if (verificationInfo) {
+            // Use provided verification info
+            transactionHash = verificationInfo.txHash;
+            networkId = verificationInfo.networkId;
+            currentPaymentId = verificationInfo.paymentId;
+            currentSignedNonce = verificationInfo.signedNonce;
+        } else {
+            // Try to get from state first
+            transactionHash = txHash;
+            networkId = selectedNetworkId;
+            currentPaymentId = paymentId;
+            currentSignedNonce = signedNonce;
+
+            // If any value is missing, try to get from localStorage
+            if (!transactionHash || !currentPaymentId || !currentSignedNonce) {
+                const reservation = getReservation();
+
+                if (!transactionHash) transactionHash = reservation.txHash;
+                if (!currentPaymentId) currentPaymentId = reservation.paymentId;
+                if (!currentSignedNonce) currentSignedNonce = reservation.signedNonce;
+            }
+        }
+
+        console.log("Verification data:", {
+            transactionHash,
+            currentPaymentId,
+            currentSignedNonce,
+            networkId
+        });
+
+        if (!transactionHash || !currentSignedNonce || !currentPaymentId) {
             handleError("Missing transaction hash, signature, or payment ID", ERROR_TYPES.VERIFICATION);
             verifyCallInProgress.current = false;
             return;
@@ -501,17 +577,17 @@ export default function PaymentModal({
 
         try {
             console.log("Verifying payment:", {
-                paymentId,
+                paymentId: currentPaymentId,
                 transactionHash,
-                signedNonce,
+                signedNonce: currentSignedNonce,
                 chainKey: isAdmin ? "sepolia" : tokenConfig.chainKey
             });
 
             // Use the verify payment mutation
             const result = await verifyMutation.mutateAsync({
-                paymentId,
+                paymentId: currentPaymentId,
                 transactionHash,
-                signedNonce,
+                signedNonce: currentSignedNonce,
                 chainKey: isAdmin ? "sepolia" : tokenConfig.chainKey
             });
 
@@ -559,6 +635,7 @@ export default function PaymentModal({
         setSignedNonce(null);
         setTxHash(null);
         setPaymentId(null);
+        setVerificationData(null);
         resetErrorState();
         setPaymentState(PAYMENT_STATES.INITIATING);
         setHasInitiated(false);
@@ -586,9 +663,22 @@ export default function PaymentModal({
             // Retry signing (only for non-admin)
             signNonce();
         } else if (txHash) {
-            // Retry verification
+            // Retry verification using the verification data or stored data
             verifyCallInProgress.current = false;
-            verifyPayment();
+
+            if (verificationData) {
+                verifyPayment(verificationData);
+            } else {
+                // Try to get data from localStorage
+                const reservation = getReservation();
+                const verificationInfo = {
+                    txHash: txHash || reservation.txHash,
+                    paymentId: paymentId || reservation.paymentId,
+                    signedNonce: signedNonce || reservation.signedNonce,
+                    networkId: selectedNetworkId
+                };
+                verifyPayment(verificationInfo);
+            }
         } else {
             // Default: reset to beginning
             resetPaymentFlow();
@@ -597,12 +687,15 @@ export default function PaymentModal({
         paymentDetails,
         signedNonce,
         txHash,
+        paymentId,
         initiatePayment,
         signNonce,
         verifyPayment,
         resetPaymentFlow,
         resetErrorState,
-        isAdmin
+        isAdmin,
+        verificationData,
+        selectedNetworkId
     ]);
 
     // Track component mount/unmount for preventing unnecessary API calls
@@ -639,6 +732,14 @@ export default function PaymentModal({
         if (signData) {
             console.log("Signature received:", signData);
             setSignedNonce(signData);
+
+            // Save signed nonce to localStorage
+            const reservation = getReservation();
+            saveReservation({
+                ...reservation,
+                signedNonce: signData
+            });
+
             setPaymentState(PAYMENT_STATES.READY);
         } else if (signError && !isAdmin) {
             // Don't process again if already handling an error
@@ -659,6 +760,14 @@ export default function PaymentModal({
         if (hash) {
             console.log("Transaction submitted:", hash);
             setTxHash(hash);
+
+            // Save txHash to localStorage
+            const reservation = getReservation();
+            saveReservation({
+                ...reservation,
+                txHash: hash
+            });
+
             setPaymentState(PAYMENT_STATES.CONFIRMING);
         } else if (writeError && !isErrorHandling) {
             // Check if user rejected transaction
@@ -687,11 +796,26 @@ export default function PaymentModal({
     useEffect(() => {
         if (isConfirmed && txHash && !isErrorHandling) {
             console.log("Transaction confirmed:", txHash);
-            verifyPayment();
+
+            // Prepare verification data
+            const reservation = getReservation();
+            const verificationInfo = {
+                txHash,
+                paymentId: paymentId || reservation.paymentId,
+                signedNonce: signedNonce || reservation.signedNonce,
+                networkId: selectedNetworkId
+            };
+
+            setVerificationData(verificationInfo);
+
+            // Verify with a slight delay to ensure state updates are processed
+            setTimeout(() => {
+                verifyPayment(verificationInfo);
+            }, 300);
         } else if (confirmError && !isErrorHandling) {
             handleError(confirmError, ERROR_TYPES.TRANSACTION);
         }
-    }, [isConfirmed, txHash, confirmError, handleError, isErrorHandling, verifyPayment]);
+    }, [isConfirmed, txHash, confirmError, handleError, isErrorHandling, verifyPayment, paymentId, signedNonce, selectedNetworkId]);
 
     // Handle chain switching errors
     useEffect(() => {
@@ -714,6 +838,7 @@ export default function PaymentModal({
         setSignedNonce(null);
         setTxHash(null);
         setPaymentId(null);
+        setVerificationData(null);
         resetErrorState();
         setPaymentState(PAYMENT_STATES.INITIATING);
         setHasInitiated(false);

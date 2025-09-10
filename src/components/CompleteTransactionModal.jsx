@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MdClose } from "react-icons/md";
 import Button from "./ui/Button";
-import { clearReservation, getReservation, saveReservation } from "@/utils/localStorage.utils";
+import { getReservation, saveReservation } from "@/utils/localStorage.utils";
 import ImageUploadBox from "./ui/ImageUpload";
 import Input from "./ui/Input";
 import { adModalSchema } from "@/schemas/ad.schema";
@@ -76,6 +76,7 @@ export default function CompleteTransactionModal({ open, onClose }) {
         createPurchase.mutate({
             ...data,
             pixelArea: reservation,
+            reservationId: reservation.reservationId,
             reservedAt: reservedAt
         });
     }

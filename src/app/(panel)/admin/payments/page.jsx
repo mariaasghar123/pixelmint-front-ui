@@ -79,7 +79,7 @@ export default function PaymentManagementPage() {
             key: "actions",
             render: (row) => (
                 <div className="flex gap-2">
-                    {row.transactionHash && (
+                    {(row.transactionHash && !row.transactionHash.includes('admin')) && (
                         <a
                             href={`https://etherscan.io/tx/${row.transactionHash}`}
                             target="_blank"
