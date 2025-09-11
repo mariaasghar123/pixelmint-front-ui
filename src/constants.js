@@ -20,13 +20,23 @@ export const TOKENS = {
         }
     },
     11155111: {
+        // old USDT config - commented out for future use
+        // usdt: {
+        //     address: "0x7169D38820dfd117C3FA1f22a697dBA58d90BA06",
+        //     name: "USDT",
+        //     fullName: "Tether USD (Test)",
+        //     decimals: 6,
+        //     icon: <Wallet className="mb-2 h-6 w-6 text-[#94D9C0]" />,
+        //     chainKey: "sepolia"
+        // },
         usdt: {
-            address: "0x7169D38820dfd117C3FA1f22a697dBA58d90BA06",
-            name: "USDT",
-            fullName: "Tether USD (Test)",
+            address: "0x2F5f6B9FF3FA56b8DF06810096e2520E435F95B5",
+            name: "tUSDT",
+            fullName: "TestUSDT",
             decimals: 6,
             icon: <Wallet className="mb-2 h-6 w-6 text-[#94D9C0]" />,
-            chainKey: "sepolia"
+            chainKey: "sepolia",
+            isTestToken: true
         },
         usdc: {
             address: "0x8267cF9254734C6Eb452a7BB7dBda921c13F9cCC",
