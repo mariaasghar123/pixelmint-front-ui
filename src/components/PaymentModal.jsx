@@ -830,7 +830,7 @@ export default function PaymentModal({
         } else if (confirmError && !isErrorHandling) {
             handleError(confirmError, ERROR_TYPES.TRANSACTION);
         }
-    }, [isConfirmed, txHash, confirmError, handleError, isErrorHandling, verifyPayment, paymentId, signedNonce, selectedNetworkId]);
+    }, [isConfirmed, txHash, confirmError, handleError, isErrorHandling, paymentId, signedNonce, selectedNetworkId]);
 
     // Handle chain switching errors
     useEffect(() => {

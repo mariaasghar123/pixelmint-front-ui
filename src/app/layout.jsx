@@ -39,6 +39,7 @@ export default function RootLayout({ children }) {
                 <ToastContainer
                     theme="dark"
                     position="bottom-right"
+                    limit={3}
                     pauseOnHover
                 />
                 <AppProviders>
