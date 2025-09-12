@@ -15,6 +15,7 @@ export default function Login() {
     const { address, isConnected } = useAccount();
     const [step, setStep] = useState("idle");
     const { authenticate } = useAuth();
+    const [authAttempts, setAuthAttempts] = useState(0);
 
     useEffect(() => {
         if (isConnected && address && step !== "authenticating" && step !== "done") {
@@ -22,14 +23,17 @@ export default function Login() {
         } else if (!isConnected && step !== "connecting" && step !== "authenticating") {
             setStep("idle");
             setButtonClicked(false);
+            setAuthAttempts(0);
         }
     }, [isConnected, address, step]);
 
     useEffect(() => {
         const handleAuthenticate = async () => {
-            if (isConnected && address && step === "connected") {
+            // Only allow up to 3 attempts
+            if (isConnected && address && step === "connected" && authAttempts < 3) {
                 setLoading(true);
                 setStep("authenticating");
+                setAuthAttempts(prev => prev + 1);
                 try {
                     const success = await authenticate();
                     setStep(success ? "done" : "connected");
@@ -39,11 +43,14 @@ export default function Login() {
                 } finally {
                     setLoading(false);
                 }
+            } else if (authAttempts >= 3) {
+                toast.error("Maximum authentication attempts reached. Please reload the page or reconnect.");
+                setStep("idle");
             }
         };
 
         handleAuthenticate();
-    }, [isConnected, address, step]);
+    }, [isConnected, address, step, authAttempts]);
 
     const handleConnectWallet = async () => {
         if (loading || buttonClicked || isConnected) {
@@ -71,7 +78,8 @@ export default function Login() {
         }
     };
 
-    const isButtonDisabled = loading || buttonClicked || isConnected || step === "connecting" || step === "authenticating";
+    const isButtonDisabled =
+        loading || buttonClicked || isConnected || step === "connecting" || step === "authenticating";
 
     const getButtonText = () => {
         if (step === "connecting" || (buttonClicked && !isConnected)) {
@@ -106,7 +114,6 @@ export default function Login() {
 
                 <p className="mt-2 text-base text-[#A9D7B8] text-center">One Tap, No Passwords.</p>
 
-                {/* Show connected address when wallet is connected */}
                 {isConnected && address && (
                     <div className="mt-4 px-4 py-2 bg-dark-500 rounded-lg">
                         <p className="text-xs text-[#A9D7B8] text-center">
@@ -126,11 +133,9 @@ export default function Login() {
                     </div>
                 </div>
 
-                {/* Step 1: Connect Wallet */}
                 {(step === "idle" || step === "connecting") && (
                     <Button
-                        className={`mt-8 w-full py-3 border-none transition-opacity duration-200 ${isButtonDisabled ? 'opacity-70 cursor-not-allowed' : ''
-                            }`}
+                        className={`mt-8 w-full py-3 border-none transition-opacity duration-200 ${isButtonDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
                         style={{
                             background: isButtonDisabled
                                 ? "linear-gradient(90deg,#4a9960 0%, #7ba88a 100%)"
@@ -149,7 +154,6 @@ export default function Login() {
                     </Button>
                 )}
 
-                {/* Step 2: Auto-authenticating */}
                 {(step === "connected" || step === "authenticating") && (
                     <div className="mt-8 w-full">
                         <div className="flex items-center justify-center space-x-2 py-3">
@@ -158,10 +162,14 @@ export default function Login() {
                                 {step === "authenticating" ? "Authenticating..." : "Preparing authentication..."}
                             </span>
                         </div>
+                        {authAttempts >= 3 && (
+                            <div className="mt-4 text-red-400 text-center text-sm">
+                                Maximum authentication attempts reached.
+                            </div>
+                        )}
                     </div>
                 )}
 
-                {/* Success message */}
                 {step === "done" && (
                     <div className="mt-8 w-full">
                         <div className="flex items-center justify-center space-x-2 py-3">

@@ -158,6 +158,9 @@ export default function PixelGridCanvas() {
     const [initialZoom, setInitialZoom] = useState(1)
     const [touchDrawing, setTouchDrawing] = useState(false)
 
+    const [reservationsLoaded, setReservationsLoaded] = useState(false)
+    const [purchasesLoaded, setPurchasesLoaded] = useState(false)
+
     const queryClient = useQueryClient()
 
     // Detect if device is mobile on mount
@@ -195,8 +198,10 @@ export default function PixelGridCanvas() {
         try {
             const res = await api.get("pixel/reservations")
             setAllReservations(res.data.payload || [])
+            setReservationsLoaded(true)
         } catch (err) {
             console.error("Failed to fetch reservations", err)
+            setReservationsLoaded(true)
         }
     }
 
@@ -235,8 +240,10 @@ export default function PixelGridCanvas() {
         queryFn: async () => {
             try {
                 const data = await api.get("/pixel/purchases")
+                setPurchasesLoaded(true)
                 return data.data.payload?.pixel
             } catch (err) {
+                setPurchasesLoaded(true)
                 console.error("Error fetching purchases:", err)
             }
         },
@@ -1115,6 +1122,10 @@ export default function PixelGridCanvas() {
     }
 
     function handleCanDrawToggle() {
+        if (!reservationsLoaded || !purchasesLoaded) {
+            toast.info("Please wait, loading grid data...")
+            return
+        }
         setCanDraw((prev) => !prev)
         setDrawing((p) => !p)
         setStartBlock(null)
@@ -1215,6 +1226,7 @@ export default function PixelGridCanvas() {
                 isMobile={isMobile}
                 clickZoomLevel={clickZoomLevel}
                 clickZoomLevels={CLICK_ZOOM_LEVELS}
+                canDrawDisabled={!reservationsLoaded || !purchasesLoaded}
             />
             <canvas
                 ref={canvasRef}

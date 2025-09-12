@@ -9,6 +9,7 @@ import { z } from "zod"
 import {
     useAccount,
     useWriteContract,
+    useReadContract,
     useWaitForTransactionReceipt,
     useChains,
     useSwitchChain,
@@ -22,7 +23,7 @@ import { useEasterEgg } from "@/hooks/useEasterEgg"
 import { useAuth } from "./AuthProvider"
 
 // Import constants
-import { TOKENS, SUPPORTED_NETWORKS, PAYMENT_STATES, ERC20_ABI } from "@/constants"
+import { TOKENS, SUPPORTED_NETWORKS, PAYMENT_STATES, ERC20_ABI, ERC20_DECIMALS_ABI } from "@/constants"
 
 // Import UI components
 import { Button, Label, Card, CardContent, Select, AmountDisplay } from "@/components/Payment/UI"
@@ -38,6 +39,7 @@ import {
 } from "@/components/Payment/StatusIndicators"
 
 import { getReservation, saveReservation, clearReservation } from "@/utils/localStorage.utils"
+import { readContract } from "viem/actions"
 
 // Form validation schema
 const paymentSchema = z.object({
@@ -269,6 +271,7 @@ export default function PaymentModal({
         reset: resetWriteContract
     } = useWriteContract();
 
+
     // Transaction confirmation
     const {
         isLoading: isConfirming,
@@ -302,6 +305,18 @@ export default function PaymentModal({
     const selectedToken = watch("token");
     const selectedNetworkName = SUPPORTED_NETWORKS[selectedNetworkId] || "Unknown Network";
     const selectedTokenConfig = TOKENS[selectedNetworkId]?.[selectedToken];
+
+
+    const {
+        data: tokenDecimals,
+        isLoading: decimalsLoading,
+        error: decimalsError
+    } = useReadContract({
+        address: selectedTokenConfig?.address,
+        abi: ERC20_DECIMALS_ABI,
+        functionName: 'decimals',
+        enabled: !!selectedTokenConfig?.address,
+    });
 
     // Check if chain switch is needed
     const isChainSwitchNeeded = isConnected && chainId !== selectedNetworkId;
@@ -921,6 +936,17 @@ export default function PaymentModal({
             return;
         }
 
+        if (decimalsLoading) {
+            toast.info('Loading token decimals...');
+            return;
+        }
+        if (decimalsError || tokenDecimals === undefined) {
+            handleError('Failed to fetch token decimals', ERROR_TYPES.TRANSACTION);
+            return;
+        }
+
+
+
         resetErrorState();
         setPaymentState(PAYMENT_STATES.PROCESSING);
 
@@ -928,7 +954,7 @@ export default function PaymentModal({
             // Calculate token amount based on token decimals
             const amount = parseUnits(
                 paymentDetails?.amount?.toString() || "0",
-                tokenConfig.decimals
+                tokenDecimals
             );
 
             console.log("Sending payment:", {

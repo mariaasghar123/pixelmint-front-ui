@@ -75,6 +75,18 @@ export const PAYMENT_STATES = {
     CANCELED: "CANCELED"
 };
 
+export const ERC20_DECIMALS_ABI = [
+    {
+        constant: true,
+        inputs: [],
+        name: "decimals",
+        outputs: [{ name: "", type: "uint8" }],
+        payable: false,
+        stateMutability: "view",
+        type: "function"
+    }
+];
+
 export const ERC20_ABI = [
     {
         name: "decimals",

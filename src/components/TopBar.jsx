@@ -42,6 +42,7 @@ function TopBar({
     isMobile,
     clickZoomLevel,
     clickZoomLevels,
+    canDrawDisabled
 }) {
     const [showModal, setShowModal] = useState(false)
 
@@ -136,7 +137,8 @@ function TopBar({
                                 background: canDraw && "#E44A4A",
                                 borderColor: canDraw && "#E44A4A",
                             }}
-                            className="whitespace-nowrap text-sm lg:text-base !p-1 md:p-2"
+                            disabled={canDrawDisabled}
+                            className="whitespace-nowrap text-sm lg:text-base !p-1 md:p-2 disabled:bg-opacity-20"
                         >
                             {canDraw ? "Revert" : "Buy Pixels"}
                         </Button>
