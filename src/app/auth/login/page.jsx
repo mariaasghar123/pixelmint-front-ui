@@ -50,7 +50,7 @@ export default function Login() {
         };
 
         handleAuthenticate();
-    }, [isConnected, address, authAttempts]);
+    }, [isConnected, address, step, authAttempts]);
 
     const handleConnectWallet = async () => {
         if (loading || buttonClicked || isConnected) {
