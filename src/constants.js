@@ -48,8 +48,8 @@ export const TOKENS = {
         },
         anas: {
             address: "0x1DFA18C791a45C82410ac5970C8a4D4ED4895E58",
-            name: "ANAS",
-            fullName: "ANAS Token",
+            name: "TEST",
+            fullName: "TEST Token",
             decimals: 18,
             icon: <Key className="mb-2 h-6 w-6 text-[#94D9C0]" />,
             isEasterEgg: true,
