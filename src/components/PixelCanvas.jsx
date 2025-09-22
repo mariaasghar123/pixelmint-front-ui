@@ -42,6 +42,21 @@ const CLICK_ZOOM_LEVELS = [5, 10, 15, 20]
 // Pan delay settings
 const PAN_DELAY_MS = 250
 
+function isPointInShape(point, shape) {
+    const topLeft = formatCoordsArr(shape.pixelArea.topLeft);
+    const bottomRight = formatCoordsArr(shape.pixelArea.bottomRight);
+
+    const x = point.x / BLOCK_SIZE;
+    const y = point.y / BLOCK_SIZE;
+
+    return (
+        x >= topLeft[0] &&
+        x <= bottomRight[0] &&
+        y >= topLeft[1] &&
+        y <= bottomRight[1]
+    );
+}
+
 function formatCoordsArr(coordArr) {
     const formatted = [Math.floor(Math.ceil(coordArr[0] / 5) * 5 / BLOCK_SIZE), Math.floor((coordArr[1] / 5) * 5 / BLOCK_SIZE)]
     return formatted
@@ -138,6 +153,7 @@ export default function PixelGridCanvas() {
 
     // Pan delay states
     const [mouseDownTime, setMouseDownTime] = useState(null)
+    const [mouseDownPosition, setMouseDownPosition] = useState(null);
     const [panDelayTimeout, setPanDelayTimeout] = useState(null)
     const [shouldPreventZoom, setShouldPreventZoom] = useState(false)
     const [pendingMouseEvent, setPendingMouseEvent] = useState(null)
@@ -161,6 +177,7 @@ export default function PixelGridCanvas() {
     const [reservationsLoaded, setReservationsLoaded] = useState(false)
     const [purchasesLoaded, setPurchasesLoaded] = useState(false)
 
+    const CLICK_THRESHOLD = 5; // Pixels of movement to distinguish between click and drag
     const queryClient = useQueryClient()
 
     // Detect if device is mobile on mount
@@ -932,6 +949,8 @@ export default function PixelGridCanvas() {
         e.preventDefault()
         if (e.button === 2) return
 
+        setMouseDownPosition({ x: e.clientX, y: e.clientY });
+
         if (activeReservation) {
             toast.error("Cancel or continue transaction before reserving another.")
             return
@@ -1051,18 +1070,40 @@ export default function PixelGridCanvas() {
         setMouseDownTime(null)
         setPendingMouseEvent(null)
 
-        // Reset prevent zoom after a short delay to allow wheel events to process normally
+        // Reset prevent zoom after a short delay
         setTimeout(() => {
             setShouldPreventZoom(false)
         }, 50)
 
-        if (panning) {
-            setPanning(false)
-            setPanStart(null)
-            return
+        // Check if this was a click or a drag
+        const isClick = mouseDownPosition && Math.abs(e.clientX - mouseDownPosition.x) < CLICK_THRESHOLD &&
+            Math.abs(e.clientY - mouseDownPosition.y) < CLICK_THRESHOLD;
+
+        // Only handle shape clicks if it was an actual click (not a pan/drag)
+        if (isClick && !drawing && !canDraw) {
+            const pixel = getPixelFromMouse(e);
+
+            if (purchases) {
+                const clickedShape = purchases.find(shape => isPointInShape(pixel, shape));
+
+                if (clickedShape && clickedShape.websiteUrl) {
+                    window.open(clickedShape.websiteUrl, '_blank');
+                    // Reset panning state to be safe
+                    setPanning(false);
+                    setPanStart(null);
+                    setMouseDownPosition(null);
+                    return;
+                }
+            }
         }
 
-        if (drawing && canDraw && startBlock && endBlock) {
+        // Handle panning
+        if (panning) {
+            setPanning(false);
+            setPanStart(null);
+            setMouseDownPosition(null);
+            return;
+        } if (drawing && canDraw && startBlock && endBlock) {
             const x1 = Math.min(startBlock[0], endBlock[0])
             const y1 = Math.min(startBlock[1], endBlock[1])
             const x2 = Math.max(startBlock[0], endBlock[0])
@@ -1113,6 +1154,7 @@ export default function PixelGridCanvas() {
         setDrawing(false)
         setStartBlock(null)
         setEndBlock(null)
+        setMouseDownPosition(null);
     }
 
     function handleResetZoom() {

@@ -7,10 +7,10 @@ import { useAuth } from "@/components/AuthProvider"
 import UserIcon from "@/components/ui/UserIcon"
 import { usePathname } from "next/navigation"
 
-// const MENU_ITEMS = [
-//     { label: "About", href: "#" },
-//     { label: "Litepaper", href: "#" },
-// ]
+const MENU_ITEMS = [
+    { label: "About", href: "https://tinyurl.com/MPMPitchDeck" },
+    { label: "Litepaper", href: "https://tinyurl.com/MPMLightPaper" },
+]
 
 export default function Navbar() {
     const { logout, loading, user } = useAuth()
@@ -34,20 +34,22 @@ export default function Navbar() {
                 </div>
 
                 <div className="hidden md:flex items-center gap-2 relative">
-                    {/* {MENU_ITEMS.map((item, i) => ( */}
-                    {/*     <Link key={i} href={item.href}> */}
-                    {/*         <Button */}
-                    {/*             className={`border text-green-100  */}
-                    {/*                 ${pathname === item.href ? "bg-green-100/20 font-semibold" : "bg-green-100/10"} `} */}
-                    {/*         > */}
-                    {/*             {item.label} */}
-                    {/*         </Button> */}
-                    {/*     </Link> */}
-                    {/* ))} */}
-                    {/**/}
-                    {/* <Button> */}
-                    {/*     Become Affiliate */}
-                    {/* </Button> */}
+                    {MENU_ITEMS.map((item, i) => (
+                        <a key={i} target="_blank" href={item.href}>
+                            <Button
+                                className={`border text-green-100 
+                                    ${pathname === item.href ? "bg-green-100/20 font-semibold" : "bg-green-100/10"} `}
+                            >
+                                {item.label}
+                            </Button>
+                        </a>
+                    ))}
+
+                    <a target="_blank" href="https://tinyurl.com/MyPixelMintAffForm">
+                        <Button>
+                            Become Affiliate
+                        </Button>
+                    </a>
 
                     {!user ? (
                         <Link href="/auth/login">
@@ -120,25 +122,31 @@ export default function Navbar() {
             <div className={`md:hidden absolute w-full top-full left-0 right-0 z-50 overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? "max-h-96" : "max-h-0"}`}>
                 <div className="bg-dark-700 border-t border-border shadow-lg">
                     <div className="container w-[90%] mx-auto py-4 flex flex-col gap-1">
-                        {/* {MENU_ITEMS.map((item, i) => ( */}
-                        {/*     <a */}
-                        {/*         key={i} */}
-                        {/*         href={item.href} */}
-                        {/*         className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none */}
-                        {/*             hover:bg-dark-600 hover:text-green-200`} */}
-                        {/*         onClick={() => setMobileMenuOpen(false)} */}
-                        {/*     > */}
-                        {/*         {item.label} */}
-                        {/*     </a> */}
-                        {/* ))} */}
-                        {/* <Link */}
-                        {/*     href="#" */}
-                        {/*     className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none */}
-                        {/*             hover:bg-dark-600 hover:text-green-200`} */}
-                        {/*     onClick={() => setMobileMenuOpen(false)} */}
-                        {/* > */}
-                        {/*     Become Affiliate */}
-                        {/* </Link> */}
+                        {MENU_ITEMS.map((item, i) => (
+                            <a
+                                key={i}
+                                target="_blank"
+                                href={item.href}
+                                className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
+                                    hover:bg-dark-600 hover:text-green-200`}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                <Button className="border border-[1px] border-green-100 bg-green-100/10 w-full text-green-100">
+                                    {item.label}
+                                </Button>
+                            </a>
+                        ))}
+                        <a
+                            href="https://tinyurl.com/MyPixelMintAffForm"
+                            target="_blank"
+                            className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
+                                    hover:bg-dark-600 hover:text-green-200`}
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            <Button className="w-full">
+                                Become Affiliate
+                            </Button>
+                        </a>
 
                         {!user ? (
                             <div className="pt-2 px-4">
@@ -159,7 +167,7 @@ export default function Navbar() {
                                 >
                                     Dashboard
                                 </Link>
-                                {user?.user?.role &&
+                                {user?.user?.role == 'admin' &&
                                     <Link
                                         href="/admin"
                                         className={`py-2 px-4 rounded-lg transition-colors duration-200 focus-visible:outline-none
