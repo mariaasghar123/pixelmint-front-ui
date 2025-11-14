@@ -13,6 +13,7 @@ import api from "@/lib/api"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import PaymentModal from "./PaymentModal"
 import PurchasePopover from "./PurchasePopover"
+import AdPreviewModal from "./AdPreviewModal"
 
 const COLOR_GRID = "#FFFFFF2A"
 const COLOR_PROP_SHAPE = "#E44A4A"
@@ -176,6 +177,10 @@ export default function PixelGridCanvas() {
 
     const [reservationsLoaded, setReservationsLoaded] = useState(false)
     const [purchasesLoaded, setPurchasesLoaded] = useState(false)
+
+    // Ad preview modal states
+    const [showAdPreviewModal, setShowAdPreviewModal] = useState(false)
+    const [selectedAd, setSelectedAd] = useState(null)
 
     const CLICK_THRESHOLD = 5; // Pixels of movement to distinguish between click and drag
     const queryClient = useQueryClient()
@@ -1086,9 +1091,9 @@ export default function PixelGridCanvas() {
             if (purchases) {
                 const clickedShape = purchases.find(shape => isPointInShape(pixel, shape));
 
-                if (clickedShape && clickedShape.websiteUrl) {
-                    window.open(clickedShape.websiteUrl, '_blank');
-                    // Reset panning state to be safe
+                if (clickedShape) {
+                    setSelectedAd(clickedShape);
+                    setShowAdPreviewModal(true);
                     setPanning(false);
                     setPanStart(null);
                     setMouseDownPosition(null);
@@ -1330,6 +1335,11 @@ export default function PixelGridCanvas() {
                     setActiveReservation(null);
                     setActiveReservationId(null)
                 }}
+            />
+            <AdPreviewModal
+                isOpen={showAdPreviewModal}
+                onClose={() => setShowAdPreviewModal(false)}
+                ad={selectedAd}
             />
         </div>
     )
