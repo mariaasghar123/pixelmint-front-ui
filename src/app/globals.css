@@ -41,13 +41,50 @@
   --background-silver-gradient: linear-gradient(90deg, rgba(192, 192, 192, 0.3) 0%, rgba(192, 192, 192, 0.3) 6%, rgba(192, 192, 192, 0.05) 100%);
   --background-bronze-gradient: linear-gradient(90deg, rgba(205, 127, 50, 0.3) 0%, rgba(205, 127, 50, 0.3) 6%, rgba(205, 127, 50, 0.05) 100%);
 
-  --color-leaf-green: #40B087;  
+  --color-leaf-green: #40B087;
 }
+/* Light mode overrides */
+[data-theme="light"] {
+  --background: #F0F6FC; 
+  
+  --foreground: #123D34;
+  
+  --color-background: #F5F5F5;
+  --color-foreground: #123D34;
+  
+  --color-gradient-from: #FFE08C;
+  --color-gradient-to: #FFD700;
+  
+  --color-border: #123D3411;
+  
+  --color-dark-900: #EBFFF9;
+  --color-dark-800: #EEFFEB;
+  /* --color-dark-800: #DFFFEA; */
+
+  --color-dark-700: #CFFFD5;
+  --color-dark-600: #EEFFEB;
+  --color-dark-500: #A0FBA0;
+  --color-dark-400: #90F990;
+
+  --color-light: #123D34;
+  --color-green-100: #B6F0D0;
+  --color-green-200: #A0E6C0;
+  --color-green-300: #8CD9B0;
+  --color-error: #E0524D;
+
+  --background-gold-gradient: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.1) 6%, rgba(255, 215, 0, 0.02) 100%);
+  --background-silver-gradient: linear-gradient(90deg, rgba(192, 192, 192, 0.2) 0%, rgba(192, 192, 192, 0.2) 6%, rgba(192, 192, 192, 0.02) 100%);
+  --background-bronze-gradient: linear-gradient(90deg, rgba(205, 127, 50, 0.2) 0%, rgba(205, 127, 50, 0.2) 6%, rgba(205, 127, 50, 0.02) 100%);
+  
+  --color-leaf-green: #85948e;  
+}
+
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+    transition: all 0.5s ease-in-out;
 }
 
 a:hover {

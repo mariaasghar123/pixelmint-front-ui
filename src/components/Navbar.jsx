@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import UserIcon from "@/components/ui/UserIcon";
 import { usePathname } from "next/navigation";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const MENU_ITEMS = [
   { label: "About", href: "https://tinyurl.com/MPMPitchDeck" },
@@ -27,7 +28,10 @@ export default function Navbar() {
   const toggleMobileMenu = () => setMobileMenuOpen((open) => !open);
 
   return (
-    <header className="w-full bg-dark-800 py-2 relative">
+    <header 
+     style={{ background: "var(--color-dark-800)", color: "var(--color-light)" }}
+  // className="transition-colors duration-500"
+    className="w-full bg-dark-800 py-2 relative transition-colors duration-500">
       <nav className="container flex items-center justify-between w-[90%] mx-auto">
         <div className="flex items-center gap-4">
           <Image
@@ -42,23 +46,46 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-2 relative">
           {MENU_ITEMS.map((item, i) => (
             <a key={i} target="_blank" href={item.href}>
-              <Button
+              {/* <Button
                 className={`border text-green-100 
                                     ${pathname === item.href ? "bg-green-100/20 font-semibold" : "bg-green-100/10"} `}
               >
                 {item.label}
-              </Button>
+              </Button> */}
+              <Button
+  className={`
+
+    /*  Light Mode */
+    bg-transparent border-1  border-black text-black 
+
+    /*  Dark Mode */
+    dark:border-4
+    dark:border-green-100 dark:text-green-100 
+    dark:bg-green-100/10 
+    dark:hover:bg-green-100/20
+
+    /* Active Page Style */
+    ${pathname === item.href ? 
+      "dark:bg-green-100/20 dark:font-semibold" : ""}
+
+  `}
+>
+  {item.label}
+</Button>
+
             </a>
           ))}
 
           <a target="_blank" href="https://tinyurl.com/MyPixelMintAffForm">
             <Button>Become Affiliate</Button>
           </a>
+          
 
           {!user ? (
             <Link href="/auth/login">
               <Button disabled={loading}>Connect Wallet</Button>
             </Link>
+            
           ) : (
             <div className="relative">
               <UserIcon onClick={handleProfileClick} />
@@ -92,6 +119,7 @@ export default function Navbar() {
               )}
             </div>
           )}
+          <ThemeSwitcher/>
         </div>
 
         <button
@@ -124,7 +152,7 @@ export default function Navbar() {
       <div
         className={`md:hidden absolute w-full top-full left-0 right-0 z-50 overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? "max-h-96" : "max-h-0"}`}
       >
-        <div className="bg-dark-700 border-t border-border shadow-lg">
+        <div className="bg-[#ffffff] dark:bg-dark-700 border-t border-border shadow-lg">
           <div className="container w-[90%] mx-auto py-4 flex flex-col gap-1">
             {MENU_ITEMS.map((item, i) => (
               <a
@@ -138,6 +166,7 @@ export default function Navbar() {
                 <Button className="border border-[1px] border-green-100 bg-green-100/10 w-full text-green-100">
                   {item.label}
                 </Button>
+                
               </a>
             ))}
             <a
@@ -191,6 +220,7 @@ export default function Navbar() {
                 </Button>
               </div>
             )}
+            <ThemeSwitcher/>
           </div>
         </div>
       </div>
