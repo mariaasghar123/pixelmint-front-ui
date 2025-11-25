@@ -125,7 +125,8 @@ export default function Header() {
 
     return (
         <div className="relative">
-            <header className="flex items-center justify-between md:justify-start p-4 px-4 bg-dark-800 md:rounded-xl">
+            <header  className="flex items-center justify-between md:justify-start p-4 px-4 bg-dark-800 md:rounded-xl" 
+            >
                 {/* Logo on mobile */}
                 <div className="flex md:hidden items-center justify-center gap-2 px-2" >
                     <img src="/logo_no_label.svg" alt="Logo" width={32} height={32} />

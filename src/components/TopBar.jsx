@@ -104,7 +104,7 @@ function TopBar({
     return (
         <>
             <AuthModal open={showModal} onClose={() => setShowModal(false)} />
-            <div className="rounded-t-lg w-full bg-[#0d2320] flex flex-col-reverse items-center justify-between p-3 lg:px-5 lg:py-3 border-b border-[#142d29] min-h-14">
+            <div className={`rounded-t-lg w-full flex flex-col-reverse items-center justify-between p-3 lg:px-5 lg:py-3 border-b border-[#142d29] min-h-14 bg-[#98F08C]/50 lg:bg-[#EEFFEB] dark:bg-[#0d2320]`}>
                 <div className="w-full md:mb-2 mt-2">
                     <div className="text-gray-400 text-left text-sm lg:text-base font-aria hidden md:block">
                         {getInstructions()}
@@ -112,7 +112,7 @@ function TopBar({
                 </div>
 
                 <div className="flex flex-wrap lg:flex-nowrap gap-3 w-full justify-start lg:justify-between items-center">
-                    <div className="py-2 lg:py-3 px-3 lg:px-4 bg-[#18312c] rounded-md flex items-center gap-3 lg:gap-4 text-xs lg:text-sm font-medium min-w-0 flex-shrink ">
+                    <div className="py-2 lg:py-3 px-3 lg:px-4 text-black shadow border-[#5ECB5F] border-1 lg:border-0 dark:border-0 lg:shadow-0 lg:bg-[#5ECB5F] dark:bg-[#18312c] rounded-md flex items-center gap-3 lg:gap-4 lg:text-white dark:text-white  text-xs lg:text-sm font-medium min-w-0 flex-shrink ">
                         <span className="whitespace-nowrap">
                             Pixel:{" "}
                             {mousePixelPos?.x !== null && mousePixelPos?.y !== null
@@ -121,7 +121,7 @@ function TopBar({
                         </span>
                         <span className="whitespace-nowrap">Block: 5x5 Pixels($25)</span>
                         {(isZoomed || magnifierActive) && (
-                            <span className="whitespace-nowrap text-green-200">
+                            <span className="whitespace-nowrap text-green-200 ">
                                 {magnifierActive
                                     ? `Canvas: ${getCurrentZoomInfo()} | Magnifier: ${magnifierZoom}x`
                                     : `Zoom: ${Math.round(zoom * 100)}%`
@@ -138,7 +138,7 @@ function TopBar({
                                 borderColor: canDraw && "#E44A4A",
                             }}
                             disabled={canDrawDisabled}
-                            className="whitespace-nowrap text-sm lg:text-base !p-1 md:p-2 disabled:bg-opacity-20"
+                            className="whitespace-nowrap text-sm shadow bg-transparent shadow border-[#5ECB5F] border-1 lg:border-0 dark:border-0 dark:bg-green-100 lg:bg-green-100 lg:text-base !p-1 md:p-2 disabled:bg-opacity-20"
                         >
                             {canDraw ? "Revert" : "Buy Pixels"}
                         </Button>
@@ -153,8 +153,8 @@ function TopBar({
                             <>
                                 <button
                                     className={`cursor-pointer p-2 rounded transition duration-150 ease ${magnifierActive
-                                        ? 'bg-green-500 hover:bg-green-600 text-white'
-                                        : 'bg-[#18312c] hover:bg-[#19992c]/80 text-white'
+                                        ? 'bg-green-500 hover:bg-green-600 dark:text-white lg:text-white'
+                                        : 'shadow-xl lg:bg-[#22C092] dark:bg-[#18312c] hover:bg-[#19992c]/80 lg:text-white dark:text-white'
                                         }`}
                                     title={magnifierActive ? "Disable Magnifier" : "Enable Magnifier (Click to zoom in)"}
                                     onClick={onMagnifierToggle}
@@ -163,12 +163,12 @@ function TopBar({
                                 </button>
 
                                 <button
-                                    className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                                    className="cursor-pointer p-2 rounded shadow-xl lg:bg-[#22C092] dark:bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
                                     title="Reset Zoom"
                                     onClick={onResetZoom}
                                     style={{ color: "#fff" }}
                                 >
-                                    <FaSearchMinus size={16} className="w-5 h-5" />
+                                    <FaSearchMinus size={16} className="w-5 h-5 text-black lg:text-white dark:text-white" />
                                 </button>
 
                                 {magnifierActive && (
@@ -207,7 +207,7 @@ function TopBar({
 
                         <button
                             onClick={expandClick}
-                            className="cursor-pointer p-2 rounded bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                            className="cursor-pointer p-2 shadow-xl  rounded text-black lg:text-white dark:text-white  lg:bg-[#22C092] dark:bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
                         >
                             {!isExpanded ? (
                                 <FaExpand size={16} className="w-5 h-5" />

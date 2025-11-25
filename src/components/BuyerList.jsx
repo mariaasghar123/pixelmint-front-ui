@@ -30,7 +30,7 @@ const defaultBorder = "rgba(192, 192, 192, 0.3)"
 
 const SkeletonCard = ({ showColors = true, index = 0 }) => (
     <div
-        className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
+        className={clsx("rounded-xl flex flex-col items-start  gap-3 px-4 py-3 h-full")}
         style={{
             background: showColors ? buyerGradients[index] || defaultGradient : defaultGradient,
             border: `0.5px solid ${showColors ? buyerBorders[index] || defaultBorder : defaultBorder}`,
@@ -43,10 +43,10 @@ const SkeletonCard = ({ showColors = true, index = 0 }) => (
                 <div className="w-8 h-12 mt-1 bg-gray-700 animate-pulse"></div>
             )}
         </div>
-        <div className="flex flex-col gap-1 w-full">
-            <div className="h-6 w-3/4 bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-4 w-1/2 bg-gray-700/60 rounded mt-1 animate-pulse"></div>
-            <div className="h-4 w-full bg-gray-700/60 rounded mt-1 animate-pulse"></div>
+        <div className="flex flex-col gap-1 w-full dark:text-white">
+            <div className="h-6 w-3/4 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-4 w-1/2 dark:bg-gray-700/60 rounded mt-1 animate-pulse"></div>
+            <div className="h-4 w-full dark:bg-gray-700/60 rounded mt-1 animate-pulse"></div>
         </div>
     </div>
 )
@@ -55,26 +55,27 @@ export default function BuyerList({
     title = "Recent buyers",
     buyers,
     icon = "FaCrown",
-    iconColor = "#FFFFFF",
+     iconColor = "#FFFFFF",
     showColors = true,
 }) {
     const Icon = iconMap[icon] || FaCrown
     const isLoading = !buyers || buyers.length === 0
 
+
     // Create an array of 5 skeleton cards when loading
     const skeletonCards = Array(5).fill(0).map((_, i) => ({ id: `skeleton-${i}`, index: i }))
 
     return (
-        <section className="w-full rounded-lg overflow-hidden" style={{ border: `0.5px solid ${defaultBorder}` }}>
-            <div className="bg-dark-800 p-4 flex items-center gap-2">
-                <h2 className="text-light text-2xl font-semibold font-ari flex items-center gap-3">
+        <section className="w-full rounded-lg overflow-hidden bg-[#C6EEC2] dark:bg-[#00302A]" style={{ border: `0.5px solid ${defaultBorder}` }}>
+            <div className="bg-[#EEFFEB] dark:bg-dark-800 p-4 flex items-center gap-2">
+                <h2 className="text-black dark:text-light text-2xl font-semibold font-ari flex items-center gap-3">
                     <span
-                        className="rounded-lg p-2 flex items-center justify-center"
+                        className="rounded-lg p-2 flex items-center justify-center "
                         style={{
                             background: `${iconColor}26`,
                         }}
                     >
-                        <Icon strokeWidth={2} className="bg-transparent rounded-full w-7 h-7" style={{ color: iconColor }} />
+                        <Icon strokeWidth={2} className="dark:bg-transparent  rounded-full w-7 h-7 text-black dark:text-white"/>
                     </span>
                     {title}
                 </h2>
@@ -104,7 +105,7 @@ export default function BuyerList({
                             : buyers.map((buyer, i) => (
                                 <SwiperSlide key={i} className="!w-full">
                                     <div
-                                        className={clsx("rounded-xl flex flex-col items-start gap-3 px-4 py-3 h-full")}
+                                        className={clsx("rounded-xl flex flex-col  items-start gap-3 px-4 py-3 h-full")}
                                         style={{
                                             background: showColors ? buyerGradients[i] || defaultGradient : defaultGradient,
                                             border: `0.5px solid ${showColors ? buyerBorders[i] || defaultBorder : defaultBorder}`,
