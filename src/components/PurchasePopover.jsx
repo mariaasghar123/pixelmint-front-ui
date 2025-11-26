@@ -62,10 +62,10 @@ export default function PurchasePopover({ coords, open, onContinuePayment, onCan
 
             <div
                 style={style}
-                className="bg-dark-800 rounded-md shadow-lg border border-green-100 flex flex-col items-center gap-2"
+                className="dark:bg-dark-800 bg-dark-300 rounded-md shadow-lg border border-green-100 flex flex-col items-center gap-2"
             >
-                <div className="text-green-200 text-base font-bold mb-1">Ready for Payment</div>
-                <div className="text-green-100 mb-2 text-xs text-center">
+                <div className="dark:text-green-200 text-base font-bold mb-1">Ready for Payment</div>
+                <div className="dark:text-green-100 mb-2 text-xs text-center">
                     Complete your pixel purchase
                 </div>
                 <div className="flex gap-2">

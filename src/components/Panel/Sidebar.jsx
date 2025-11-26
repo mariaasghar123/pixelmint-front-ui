@@ -60,17 +60,17 @@ export default function Sidebar() {
     const tabs = getTabsForPath(pathname);
 
     return (
-        <aside className="bg-dark-800 min-h-[calc(100dvh - 1.25rem)] w-44 hidden md:flex flex-col py-6 px-4 rounded-2xl min-w-[250px]">
+        <aside className="dark:bg-dark-800 bg-dark-300 min-h-[calc(100dvh - 1.25rem)] w-44 hidden md:flex flex-col py-6 px-4 rounded-2xl min-w-[250px]">
             <div className="flex items-center justify-center gap-2 mb-3 px-2" >
                 <img src="/logo_no_label.svg" alt="Logo" width={32} height={32} />
                 <span className="font-semibold font-ari text-2xl">
                     <span className="text-[#1E894B]">
                         my
                     </span>
-                    <span className="text-[#5DD075]">
+                    <span className="dark:text-[#5DD075] text-dark-400">
                         Pixel
                     </span>
-                    <span className="text-green-100">
+                    <span className="dark:text-green-100 text-dark-400">
                         Mint
                     </span>
                 </span>
@@ -88,12 +88,12 @@ export default function Sidebar() {
                             <button
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold w-full transition
                                   ${active
-                                        ? "bg-green-100 text-dark-700"
-                                        : "bg-dark-800 hover:bg-[#224C38] cursor-pointer"}
+                                        ? "dark:bg-green-100 bg-dark-500 dark:text-dark-700 text-white"
+                                        : "dark:bg-dark-800 dark:text-light text-gray-700 bg-dark-100 dark:hover:bg-[#224C38] hover:bg-green-300 cursor-pointer"}
                                 `}
                             >
-                                <div className={`p-2 rounded-xl ${active ? 'bg-[#0024201A]' : 'bg-green-100'}`}>
-                                    <Icon size={18} strokeWidth={0} color="#002420" />
+                                <div className={`p-2 rounded-xl ${active ? 'dark:bg-[#0024201A] bg-dark-100' : 'dark:bg-green-100 bg-green-400'}`}>
+                                    <Icon size={18} strokeWidth={0} color="text-[#002420]" />
                                 </div>
                                 {tab.name}
                             </button>

@@ -50,7 +50,7 @@ export default function ImageUploadBox({ onUpload, label = "Upload Image" }) {
         <div>
             <label className="block text-light mb-1 ">{label}</label>
             <div
-                className="border border-dashed border-light rounded-lg bg-transparent flex flex-col items-center justify-center py-8 cursor-pointer hover:border-green-300 transition relative"
+                className="border border-dashed dark:border-light rounded-lg bg-transparent flex flex-col items-center justify-center py-8 cursor-pointer hover:border-green-300 transition relative"
                 style={{ minHeight: "70px" }}
                 onClick={triggerFileInput}
                 onDrop={handleDrop}
@@ -87,7 +87,7 @@ export default function ImageUploadBox({ onUpload, label = "Upload Image" }) {
                     ) :
                         <>
                             <UploadIcon />
-                            <span className="mt-2 text-light font-aria text-lg">Upload Image</span>
+                            <span className="mt-2 dark:text-light font-aria text-lg">Upload Image</span>
                         </>
                     }
                 </div>

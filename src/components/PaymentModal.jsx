@@ -112,7 +112,7 @@ const ErrorBanner = ({ error, errorType, onRetry, onReset }) => {
                 <ShieldAlert className="h-6 w-6 text-[#E0524D] flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                     <h4 className="font-medium text-[#E0524D] mb-1">{title}</h4>
-                    <p className="text-sm text-[#EBFFF9]/80 mb-3">{message}</p>
+                    <p className="text-sm dark:text-[#EBFFF9]/80 mb-3">{message}</p>
                     <div className="flex gap-2">
                         {showRetry && (
                             <Button
@@ -126,7 +126,7 @@ const ErrorBanner = ({ error, errorType, onRetry, onReset }) => {
                         {showReset && (
                             <Button
                                 onClick={onReset}
-                                className="bg-transparent border border-[#FFFFFF33] hover:bg-[#FFFFFF11] text-[#EBFFF9] flex-1"
+                                className="dark:bg-transparent border border-[#FFFFFF33] hover:bg-[#FFFFFF11] text-[#EBFFF9] flex-1"
                             >
                                 Start New Payment
                             </Button>
@@ -979,12 +979,12 @@ export default function PaymentModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-auto">
-            <div className="bg-[#002420] rounded-2xl px-5 md:px-8 py-6 max-w-[500px] w-full shadow-2xl border border-green-200 flex flex-col items-start relative max-h-[90vh] overflow-auto">
+            <div className="dark:bg-[#002420] bg-dark-300 rounded-2xl px-5 md:px-8 py-6 max-w-[500px] w-full shadow-2xl border border-green-200 flex flex-col items-start relative max-h-[90vh] overflow-auto">
                 <button
                     type="button"
                     aria-label="Close"
                     onClick={handleClose}
-                    className="absolute top-4 right-4 text-[#94D9C0]/60 hover:text-[#EBFFF9] transition-colors cursor-pointer z-10"
+                    className="absolute top-4 right-4 dark:text-[#94D9C0]/60 dark:hover:text-[#EBFFF9] transition-colors cursor-pointer z-10"
                 >
                     <X size={24} />
                 </button>
@@ -995,11 +995,11 @@ export default function PaymentModal({
                     onClick={incrementEasterEggCounter}
                 ></div>
 
-                <div className="text-2xl md:text-3xl font-semibold mb-2 text-[#EBFFF9] font-sans tracking-tight pr-8">
+                <div className="text-2xl md:text-3xl font-semibold mb-2 dark:text-[#EBFFF9] font-sans tracking-tight pr-8">
                     {isAdmin ? "Admin Payment Approval" : title}
                 </div>
 
-                <p className="text-[#94D9C0]/70 mb-5">
+                <p className="dark:text-[#94D9C0]/70 mb-5">
                     {isAdmin
                         ? "Approve this payment as an administrator"
                         : description}
@@ -1007,7 +1007,7 @@ export default function PaymentModal({
 
                 {!isAdmin && !isConnected && (
                     <div className="w-full mb-4 p-3 bg-[#E0524D]/10 border border-[#E0524D]/20 rounded-lg">
-                        <p className="text-[#E0524D] text-sm">Please connect your wallet first</p>
+                        <p className="dark:text-[#E0524D] text-sm">Please connect your wallet first</p>
                     </div>
                 )}
 

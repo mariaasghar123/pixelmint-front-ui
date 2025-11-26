@@ -86,9 +86,9 @@ export default function ReservePixelsModal({ open, onClose, coords, onConfirmed 
 
     return open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-dark-800 rounded-2xl px-6 md:px-12 py-8 w-[90%] md:w-full max-w-[550px] shadow-2xl border border-border flex flex-col items-center">
-                <div className="text-2xl md:text-4xl font-semibold mb-3 text-green-200 font-ari tracking-tight">Pixels Reserved!</div>
-                <div className="text-green-100 mb-3 text-center text-sm md:text-lg">Please confirm your reservation of the selected pixels.</div>
+            <div className="bg-dark-100/80 dark:bg-dark-800 rounded-2xl px-6 md:px-12 py-8 w-[90%] md:w-full max-w-[550px] shadow-2xl border border-border flex flex-col items-center">
+                <div className="text-2xl md:text-4xl font-semibold mb-3 dark:text-green-200 font-ari tracking-tight">Pixels Reserved!</div>
+                <div className="dark:text-green-100 mb-3 text-center text-sm md:text-lg">Please confirm your reservation of the selected pixels.</div>
                 <div className="mb-8 w-full flex justify-center">
                     <AreaPriceCard />
                 </div>

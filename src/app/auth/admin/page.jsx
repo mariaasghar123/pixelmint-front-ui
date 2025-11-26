@@ -34,12 +34,12 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-center">
+        <div className="min-h-screen w-full flex flex-col items-center justify-center  dark:bg-dark-700 bg-dark-200">
             <div className="flex flex-col items-center mb-4">
                 <Image src="/logo.svg" width={150} height={170} alt="Logo" priority />
             </div>
 
-            <div className="w-[90%] md:w-full max-w-[500px] bg-transparent rounded-xl border-2 border-[rgba(101,231,140,0.25)] flex flex-col items-center py-8 px-12 shadow-lg">
+            <div className="w-[90%] md:w-full max-w-[500px] dark:bg-transparent bg-dark-100 rounded-xl border-2 border-[rgba(101,231,140,0.25)] flex flex-col items-center py-8 px-12 shadow-lg">
                 <div
                     className="bg-dark-700 rounded-full flex items-center justify-center mb-2"
                     style={{ width: 56, height: 56 }}
@@ -47,9 +47,9 @@ export default function Login() {
                     <Shield size={32} fill="#98F08C" strokeWidth={0} />
                 </div>
 
-                <h1 className="mt-4 text-2xl font-semibold text-dark-100 text-center">Admin Login</h1>
+                <h1 className="mt-4 text-2xl font-semibold dark:text-dark-100 text-black text-center">Admin Login</h1>
 
-                <p className="mt-2 text-base text-[#A9D7B8] text-center">Enter your credentials to continue.</p>
+                <p className="mt-2 text-base dark:text-[#A9D7B8] text-gray-800 text-center">Enter your credentials to continue.</p>
 
                 {!isSuccess && (
                     <form onSubmit={handleLogin} className="mt-8 w-full space-y-4">
@@ -97,7 +97,7 @@ export default function Login() {
                     </div>
                 )}
 
-                <div className="mt-4 text-xs text-[#A9D7B8] text-center opacity-80">
+                <div className="mt-4 text-xs dark:text-[#A9D7B8] text-gray-700 text-center opacity-80">
                     Secure admin login with email and password authentication
                 </div>
             </div>

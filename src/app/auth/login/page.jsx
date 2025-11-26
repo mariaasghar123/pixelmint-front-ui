@@ -92,7 +92,7 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-center bg-dark-700">
+        <div className="min-h-screen w-full flex flex-col items-center justify-center dark:bg-dark-700 bg-dark-200">
             <div className="flex flex-col items-center mb-4">
                 <Image
                     src="/logo.svg"
@@ -103,17 +103,15 @@ export default function Login() {
                 />
             </div>
 
-            <div className="w-[90%] md:w-full max-w-[500px] bg-transparent rounded-xl border-2 border-[rgba(101,231,140,0.25)] flex flex-col items-center py-8 px-12 shadow-lg">
+            <div className="w-[90%] md:w-full max-w-[500px] dark:bg-transparent bg-dark-100 rounded-xl border-2 border-[rgba(101,231,140,0.25)] flex flex-col items-center py-8 px-12 shadow-lg">
                 <div className="bg-dark-400 rounded-full flex items-center justify-center mb-2" style={{ width: 56, height: 56 }}>
                     <Wallet size={32} fill="#98F08C" strokeWidth={0} />
                 </div>
-
-                <h1 className="mt-4 text-2xl font-semibold font-ari text-light text-center">
+                <h1 className="mt-4 text-2xl font-semibold font-ari text-black dark:text-light text-center">
                     Login with your crypto wallet
                 </h1>
 
-                <p className="mt-2 text-base text-[#A9D7B8] text-center">One Tap, No Passwords.</p>
-
+                <p className="mt-2 text-base dark:text-[#A9D7B8] text-gray-500 text-center">One Tap, No Passwords.</p>
                 {isConnected && address && (
                     <div className="mt-4 px-4 py-2 bg-dark-500 rounded-lg">
                         <p className="text-xs text-[#A9D7B8] text-center">
@@ -183,7 +181,7 @@ export default function Login() {
                     </div>
                 )}
 
-                <div className="mt-2 text-xs text-[#A9D7B8] text-center opacity-80">
+                <div className="mt-2 text-xs dark:text-[#A9D7B8] text-gray-700 text-center opacity-80">
                     Supports MetaMask, WalletConnect, Coinbase Wallet, and other Web3 wallets
                 </div>
             </div>

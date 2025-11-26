@@ -6,22 +6,22 @@ import { FaExpand, FaCompress, FaHome, FaSearchPlus, FaPlus, FaMinus, FaCrosshai
 
 function PixelLegend() {
     return (
-        <div className="flex items-center flex-wrap gap-3 lg:gap-6 bg-[#18312c] rounded-lg px-3 lg:px-5 py-2 lg:py-[7px]">
+        <div className="flex items-center flex-wrap gap-3 lg:gap-6 dark:bg-[#18312c] bg-[#22C092]/50 rounded-lg px-3 lg:px-5 py-2 lg:py-[7px]">
             <span className="flex items-center gap-2">
-                <span className="inline-block w-4 h-4 lg:w-5 lg:h-5 rounded bg-dark-800" />
-                <span className="text-green-200 text-sm lg:text-lg font-normal">Free</span>
+                <span className="inline-block w-4 h-4 lg:w-5 lg:h-5 rounded bg-green-800 bg:bg-dark-800" />
+                <span className="dark:text-green-200 text-sm lg:text-lg font-normal">Free</span>
             </span>
             <span className="flex items-center gap-2">
                 <span className="inline-block w-4 h-4 lg:w-5 lg:h-5 rounded bg-error" />
-                <span className="text-green-200 text-sm lg:text-lg font-normal">Taken</span>
+                <span className="dark:text-green-200 text-sm lg:text-lg font-normal">Taken</span>
             </span>
             <span className="flex items-center gap-2">
                 <span className="inline-block w-4 h-4 lg:w-5 lg:h-5 rounded bg-[#3b82f6]" />
-                <span className="text-green-200 text-sm lg:text-lg font-normal">Reserved</span>
+                <span className="dark:text-green-200 text-sm lg:text-lg font-normal">Reserved</span>
             </span>
             <span className="flex items-center gap-2">
                 <span className="inline-block w-4 h-4 lg:w-5 lg:h-5 rounded bg-green-300" />
-                <span className="text-green-200 text-sm lg:text-lg font-normal">Selected</span>
+                <span className="dark:text-green-200 text-sm lg:text-lg font-normal">Selected</span>
             </span>
         </div>
     )
@@ -154,7 +154,7 @@ function TopBar({
                                 <button
                                     className={`cursor-pointer p-2 rounded transition duration-150 ease ${magnifierActive
                                         ? 'bg-green-500 hover:bg-green-600 dark:text-white lg:text-white'
-                                        : 'shadow-xl lg:bg-[#22C092] dark:bg-[#18312c] hover:bg-[#19992c]/80 lg:text-white dark:text-white'
+                                        : 'shadow-xl lg:bg-[#22C092]/50 dark:bg-[#18312c] hover:bg-[#19992c]/80 lg:text-white dark:text-white'
                                         }`}
                                     title={magnifierActive ? "Disable Magnifier" : "Enable Magnifier (Click to zoom in)"}
                                     onClick={onMagnifierToggle}
@@ -163,7 +163,7 @@ function TopBar({
                                 </button>
 
                                 <button
-                                    className="cursor-pointer p-2 rounded shadow-xl lg:bg-[#22C092] dark:bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                                    className="cursor-pointer p-2 rounded shadow-xl lg:bg-[#22C092]/50 dark:bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
                                     title="Reset Zoom"
                                     onClick={onResetZoom}
                                     style={{ color: "#fff" }}
@@ -207,7 +207,7 @@ function TopBar({
 
                         <button
                             onClick={expandClick}
-                            className="cursor-pointer p-2 shadow-xl  rounded text-black lg:text-white dark:text-white  lg:bg-[#22C092] dark:bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
+                            className="cursor-pointer p-2 shadow-xl  rounded text-black lg:text-white dark:text-white  lg:bg-[#22C092]/50 dark:bg-[#18312c] hover:bg-[#19992c]/80 transition duration-150 ease"
                         >
                             {!isExpanded ? (
                                 <FaExpand size={16} className="w-5 h-5" />

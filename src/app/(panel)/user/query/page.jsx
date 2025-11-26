@@ -16,18 +16,18 @@ export default function SupportCards() {
 
     return (
         <div className="flex flex-col md:flex-row gap-6 w-full mx-auto mt-6">
-            <div className="flex-1 bg-dark-800 rounded-lg p-5 min-w-[300px] flex flex-col">
-                <h3 className="text-2xl font-semibold text-white mb-1">Your Unique Code</h3>
+            <div className="flex-1 dark:bg-dark-800 bg-gray-300 rounded-lg p-5 min-w-[300px] flex flex-col">
+                <h3 className="text-2xl font-semibold dark:text-white text-dark-700 mb-1">Your Unique Code</h3>
                 <p className="text-xl text-gray-400 mb-4">
                     You can use this unique code to message admin via Telegram.
                 </p>
                 <div className="flex-1" />
-                <div className="flex items-center bg-dark-800 rounded-xl border border-white overflow-hidden p-1">
+                <div className="flex items-center dark:bg-dark-800 bg-dark-200 rounded-xl border dark:border-white border-black overflow-hidden p-1">
                     <input
                         type="text"
                         value={uniqueCode}
                         onChange={e => setUniqueCode(e.target.value)}
-                        className="bg-transparent text-white px-3 py-2 flex-1 text-base outline-none"
+                        className="bg-transparent dark:text-white text-gray-400 px-3 py-2 flex-1 text-base outline-none"
                     />
                     <Button
                         onClick={handleCopy}
@@ -40,8 +40,8 @@ export default function SupportCards() {
             </div>
 
             {/* Support Card */}
-            <div className="flex-1 bg-dark-800 rounded-lg p-5 min-w-[300px] flex flex-col">
-                <h3 className="text-2xl font-semibold text-white mb-1">Support</h3>
+            <div className="flex-1 dark:bg-dark-800 bg-gray-300 rounded-lg p-5 min-w-[300px] flex flex-col">
+                <h3 className="text-2xl font-semibold dark:text-white text-dark-700 mb-1">Support</h3>
                 <p className="text-xl text-gray-400 mb-4">
                     Need help? Contact admin directly via Telegram.<br />
                     Must share your Unique code with admin

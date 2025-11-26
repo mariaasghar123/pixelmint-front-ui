@@ -6,8 +6,8 @@ export default function AdsList({ ads = [], onOpen }) {
     const hasAds = Array.isArray(ads) && ads.length > 0
 
     return (
-        <section className="bg-dark-800 rounded-xl p-4 md:p-6 w-full mt-5 mx-auto">
-            <h2 className="text-white font-semibold text-lg mb-4">Active Advertisements</h2>
+        <section className="dark:bg-dark-800 bg-dark-200 dark:border-0 border border-black rounded-xl p-4 md:p-6 w-full mt-5 mx-auto">
+            <h2 className="dark:text-white text-dark-500 font-semibold text-lg mb-4">Active Advertisements</h2>
             <div className="flex flex-col gap-4">
                 {hasAds ? (
                     ads.map((ad) => (
@@ -42,8 +42,8 @@ export default function AdsList({ ads = [], onOpen }) {
                         </div>
                     ))
                 ) : (
-                    <div className="text-center text-[#A9D7B8] py-8">
-                        <span>No advertisements found. <span className="font-bold text-green-200">Buy some pixels to advertise!</span></span>
+                    <div className="text-center dark:text-[#A9D7B8] text-dark-400 py-8">
+                        <span>No advertisements found. <span className="font-bold dark:text-green-200 text-dark-700">Buy some pixels to advertise!</span></span>
                     </div>
                 )}
             </div>

@@ -62,14 +62,14 @@ export default function ReservedShapePopover({ coords, open, onContinue, onCance
 
             <div
                 style={style}
-                className="bg-dark-800 rounded-md shadow-lg border border-green-400 flex flex-col items-center gap-2"
+                className="dark:bg-dark-800 bg-dark-100 rounded-md shadow-lg border border-green-400 flex flex-col items-center gap-2"
             >
-                <div className="text-green-200 text-base font-bold mb-1">Pixels Reserved</div>
-                <div className="text-green-100 mb-2 text-xs text-center">
+                <div className="dark:text-green-200 text-base font-bold mb-1">Pixels Reserved</div>
+                <div className="dark:text-green-100 mb-2 text-xs text-center">
                     You have a reservation for these pixels.
                 </div>
                 <div className="flex gap-2">
-                    <Button className="" onClick={onContinue}>Continue</Button>
+                    <Button className="dark:bg-dark-100 bg-green-300" onClick={onContinue}>Continue</Button>
                     <Button
                         className="!bg-error !hover:bg-error/20 !border-none"
                         onClick={handleClose}

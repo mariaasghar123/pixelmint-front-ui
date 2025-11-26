@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Button from "@/components/ui/Button"
+import ThemeSwitcher from "@/components/ThemeSwitcher"
 
 const CustomInput = ({ type = "text", placeholder, value, onChange, required = false, className = "" }) => (
     <input
@@ -15,7 +16,7 @@ const CustomInput = ({ type = "text", placeholder, value, onChange, required = f
 )
 
 const CustomCard = ({ children, className = "" }) => (
-    <div className={`rounded-lg border border-dark-700 bg-dark-600 shadow-sm ${className}`}>{children}</div>
+    <div className={`rounded-lg border border-dark-700 dark:bg-dark-600 bg-dark-300 shadow-sm ${className}`}>{children}</div>
 )
 
 const CustomCardContent = ({ children, className = "" }) => <div className={`p-6 ${className}`}>{children}</div>
@@ -42,12 +43,12 @@ export default function Page() {
     }
 
     return (
-        <div className="min-h-screen bg-dark-700 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-dark-200 dark:bg-dark-700 flex items-center justify-center p-4">
             <div className="max-w-2xl w-full text-center space-y-8">
                 {/* Header Section */}
                 <div className="space-y-4">
                     <h1 className="text-4xl md:text-6xl font-bold text-emerald-400 font-sans">We're Building Something Great!</h1>
-                    <p className="text-lg md:text-xl text-dark-300 font-sans">
+                    <p className="text-lg md:text-xl text-dark-400 dark:text-dark-300 font-sans">
                         Stay tuned for updates as we craft an amazing experience for you.
                     </p>
                 </div>
@@ -56,11 +57,11 @@ export default function Page() {
                 <CustomCard className="p-6">
                     <CustomCardContent className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <span className="text-sm font-medium text-dark-100">Development Progress</span>
-                            <span className="text-sm font-bold text-emerald-400">75%</span>
+                            <span className="text-sm font-medium dark:text-dark-100 text-dark-400">Development Progress</span>
+                            <span className="text-sm font-bold dark:text-emerald-400 text-dark-400">75%</span>
                         </div>
                         <CustomProgress value={75} className="h-3" />
-                        <p className="text-sm text-dark-300">We're making great progress! The core features are taking shape.</p>
+                        <p className="text-sm dark:text-dark-300 text-dark-400">We're making great progress! The core features are taking shape.</p>
                     </CustomCardContent>
                 </CustomCard>
             </div>

@@ -13,6 +13,7 @@ import {
     FaBars,
     FaTimes,
 } from "react-icons/fa"
+import ThemeSwitcher from "../ThemeSwitcher"
 
 const headerPropsByPath = {
     "/user": {
@@ -125,7 +126,7 @@ export default function Header() {
 
     return (
         <div className="relative">
-            <header  className="flex items-center justify-between md:justify-start p-4 px-4 bg-dark-800 md:rounded-xl" 
+            <header  className="flex items-center justify-between md:justify-start p-4 px-4 dark:bg-dark-800 bg-dark-300 md:rounded-xl" 
             >
                 {/* Logo on mobile */}
                 <div className="flex md:hidden items-center justify-center gap-2 px-2" >
@@ -153,19 +154,20 @@ export default function Header() {
 
                 {/* Header title & subtitle */}
                 <div className={`hidden md:flex flex-col justify-center mr-6 ${!!(title === null && subtitle === null) ?? 'hidden'}`}>
-                    <h2 className="text-2xl font-semibold text-light">{title}</h2>
-                    <span className="text-lg text-gray-400">{subtitle}</span>
+                    <h2 className="text-2xl font-semibold dark:text-light text-dark-400">{title}</h2>
+                    <span className="text-lg dark:text-gray-400 text-dark-500">{subtitle}</span>
                 </div>
 
                 {/* Search bar for admin, can be extended for user */}
                 <input
                     type="text"
                     placeholder={pathname.startsWith("/admin") ? "Search Users, Transactions..." : "Search Ads, Pixels..."}
-                    className="hidden md:block ml-auto w-full max-w-md px-4 py-3 rounded-lg bg-dark-700 text-light text-lg focus:outline-none focus:ring-2 focus:ring-green-100"
+                    className="hidden md:block ml-auto w-full max-w-md px-4 py-3 rounded-lg dark:bg-dark-700 bg-dark-200 dark:text-light text-gray-700 text-lg focus:outline-none focus:ring-2 focus:ring-green-100"
                 />
                 <Button className="hidden md:block ml-4 h-full" onClick={() => router.push("/")}>
                     Home
                 </Button>
+                <div className="ml-2"> <ThemeSwitcher/> </div>
             </header>
 
             {/* Mobile Dropdown Tabs */}

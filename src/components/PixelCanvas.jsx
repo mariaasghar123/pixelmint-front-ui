@@ -1,5 +1,5 @@
 "use client"
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState, useContext } from "react"
 import TopBar from "./TopBar"
 import { useToggleFullscreen } from "@/hooks/useFullscreen"
 import { toast } from "react-toastify"
@@ -14,8 +14,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import PaymentModal from "./PaymentModal"
 import PurchasePopover from "./PurchasePopover"
 import AdPreviewModal from "./AdPreviewModal"
+import { ThemeContext } from "./ThemeProviders"
 
-const COLOR_GRID = "#FFFFFF2A"
+//  const COLOR_GRID = "#FFFFFF2A"
+const getGridColor = () => {
+  return theme === 'dark' ? "#FFFFFF2A" : "#FFFFFF"; // Dark: white transparent, Light: light gray
+};
 const COLOR_PROP_SHAPE = "#E44A4A"
 const COLOR_DRAW_PREVIEW = "#31AF99"
 const COLOR_RESERVATION = "#3b82f6"
@@ -144,6 +148,8 @@ export default function PixelGridCanvas() {
 
     const [showPaymentModal, setShowPaymentModal] = useState(false)
     const [showPurchasePopover, setShowPurchasePopover] = useState(false)
+    const { theme } = useContext(ThemeContext); // Add this line
+
 
     // Magnifying glass states
     const [magnifierActive, setMagnifierActive] = useState(false)
@@ -330,7 +336,7 @@ export default function PixelGridCanvas() {
         ctx.translate(offset.x, offset.y)
         ctx.scale(zoom, zoom)
 
-        ctx.strokeStyle = COLOR_GRID
+        ctx.strokeStyle = getGridColor
         ctx.lineWidth = 0.8 / zoom
         ctx.beginPath()
         for (let x = 0; x <= GRID_WIDTH; x++) {
@@ -446,7 +452,7 @@ export default function PixelGridCanvas() {
         tempCtx.translate(-sourceLeft, -sourceTop)
 
         // Draw grid
-        tempCtx.strokeStyle = COLOR_GRID
+        tempCtx.strokeStyle = getGridColor
         tempCtx.lineWidth = 0.8
         tempCtx.beginPath()
         for (let x = 0; x <= GRID_WIDTH; x++) {
@@ -1279,7 +1285,7 @@ export default function PixelGridCanvas() {
                 ref={canvasRef}
                 width={PIXEL_CANVAS_WIDTH}
                 height={PIXEL_CANVAS_HEIGHT}
-                className="bg-dark-700 border border-border"
+                className="dark:bg-dark-700 bg-dark-300 border border-border"
                 style={{
                     width: '100%',
                     height: `${PIXEL_CANVAS_HEIGHT * canvasScale}px`,

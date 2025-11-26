@@ -1,6 +1,6 @@
 import localFont from "next/font/local"
 import { ToastContainer } from "react-toastify";
-
+import ThemeProvider from "@/components/ThemeProviders";
 import AppProviders from "@/components/AppProviders";
 import "./globals.css";
 
@@ -36,6 +36,7 @@ export default function RootLayout({ children }) {
             <body
                 className={`${ari.variable} antialiased`}
             >
+               <ThemeProvider>
                 <ToastContainer
                     theme="dark"
                     position="bottom-right"
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
                 <AppProviders>
                     {children}
                 </AppProviders>
+                </ThemeProvider>
             </body>
         </html>
     );
