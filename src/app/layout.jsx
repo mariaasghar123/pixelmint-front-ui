@@ -33,21 +33,27 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="en">
-            <body
-                className={`${ari.variable} antialiased`}
-            >
-               <ThemeProvider>
-                <ToastContainer
-                    theme="dark"
-                    position="bottom-right"
-                    limit={3}
-                    pauseOnHover
-                />
-                <AppProviders>
-                    {children}
-                </AppProviders>
-                </ThemeProvider>
-            </body>
-        </html>
+  <head>
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+              document.documentElement.classList.add('dark');
+            }
+          })();
+        `,
+      }}
+    />
+  </head>
+  <body className={`${ari.variable} antialiased`}>
+    <ThemeProvider>
+      <AppProviders>{children}</AppProviders>
+    </ThemeProvider>
+  </body>
+</html>
+
     );
 }

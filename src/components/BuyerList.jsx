@@ -45,7 +45,7 @@ const SkeletonCard = ({ showColors = true, index = 0 }) => (
         </div>
         <div className="flex flex-col gap-1 w-full dark:text-white">
             <div className="h-6 w-3/4 dark:bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-4 w-1/2 dark:bg-gray-700/60 rounded mt-1 animate-pulse"></div>
+            <div className="h-4 w-1/2 dark:bg-gray-700/60 text-gray-700 rounded mt-1 animate-pulse"></div>
             <div className="h-4 w-full dark:bg-gray-700/60 rounded mt-1 animate-pulse"></div>
         </div>
     </div>
@@ -180,8 +180,8 @@ export default function BuyerList({
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <div className="font-semibold text-lg font-sans underline">{buyer?.displayName || 'User'}</div>
-                                        <div className="text-light/60 font-sans text-sm">Bought: {buyer?.purchaseArea || 0}</div>
-                                        <div className="text-light/60 font-sans text-sm">
+                                        <div className="dark:text-light/60 font-sans text-sm">Bought: {buyer?.purchaseArea || 0}</div>
+                                        <div className="dark:text-light/60 font-sans text-sm">
                                             Position: {`((${buyer?.purchasePosition?.topLeft || '--,--'}), (${buyer?.purchasePosition?.bottomRight || '--,--'}))`}
                                         </div>
                                     </div>

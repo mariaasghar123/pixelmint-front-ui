@@ -65,8 +65,8 @@ export default function Page() {
             key: "name",
             render: (row) => (
                 <div>
-                    <div className="font-semibold text-white">{row.name}</div>
-                    <div className="text-light/40 text-sm">{row.website}</div>
+                    <div className="font-semibold dark:text-white">{row.name}</div>
+                    <div className="dark:text-light/40 text-sm">{row.website}</div>
                 </div>
             ),
         },
@@ -75,8 +75,8 @@ export default function Page() {
             key: "pixels",
             render: (row) => (
                 <div>
-                    <div className="text-white">{row.pixels}</div>
-                    <div className="text-light/40 text-sm">{row.value}</div>
+                    <div className="dark:text-white">{row.pixels}</div>
+                    <div className="dark:text-light/40 text-gray-600 text-sm">{row.value}</div>
                 </div>
             ),
         },
@@ -85,10 +85,10 @@ export default function Page() {
             key: "ads",
             render: (row) => (
                 <div className="flex flex-col items-start">
-                    <span className="text-white">{row.ads}</span>
+                    <span className="dark:text-white">{row.ads}</span>
                     <div className="flex gap-1">
                         {row.adImages.slice(0, 2).map((src, idx) => (
-                            <ImageIcon key={idx} className="text-light/40" />
+                            <ImageIcon key={idx} className="dark:text-light/40 text-gray-700" />
                         ))}
                     </div>
                 </div>
@@ -99,8 +99,8 @@ export default function Page() {
             key: "date",
             render: (row) => (
                 <div>
-                    <div className="text-white">{row.date}</div>
-                    <div className="text-light/40 text-sm">{row.time}</div>
+                    <div className="dark:text-white">{row.date}</div>
+                    <div className="dark:text-light/40 text-sm">{row.time}</div>
                 </div>
             ),
         },
@@ -110,13 +110,13 @@ export default function Page() {
             render: (row) => (
                 <div className="flex gap-2">
                     <button
-                        className="bg-dark-800 p-2 rounded-lg hover:bg-white/5"
+                        className="dark:bg-dark-800 p-2 rounded-lg hover:bg-white/5"
                         style={{
                             background: "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)",
                         }}
                         onClick={() => handleViewUser(row)}
                     >
-                        <Eye className="text-light w-5 h-5" />
+                        <Eye className="dark:text-light w-5 h-5" />
                     </button>
                 </div>
             ),
@@ -127,7 +127,7 @@ export default function Page() {
         <main className="mt-5">
             <div>
                 <h1 className="font-bold text-2xl">User Management</h1>
-                <p className="text-light/60">Manage Users and their pixel purchases</p>
+                <p className="dark:text-light/60">Manage Users and their pixel purchases</p>
             </div>
             <SearchFilterBar
                 className="mt-3 mb-5"

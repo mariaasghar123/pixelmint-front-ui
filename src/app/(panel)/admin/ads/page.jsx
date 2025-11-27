@@ -143,7 +143,7 @@ export default function PixelPurchasesPage() {
         <main className="mt-5">
             <div>
                 <h1 className="font-bold text-2xl">Pixel Purchases</h1>
-                <p className="text-light/60">Review and manage pixel ad purchases</p>
+                <p className="dark:text-light/60">Review and manage pixel ad purchases</p>
             </div>
             <SearchFilterBar className="mt-3 mb-5" searchValue={searchName} onSearchChange={setSearchName} />
             <Table columns={columns} data={filteredTableData} isLoading={isLoading} />

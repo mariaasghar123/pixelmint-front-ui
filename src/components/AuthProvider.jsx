@@ -93,6 +93,30 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+//     const adminLogin = async (credentials) => {
+//     // 🚨 TEMPORARY BYPASS (REMOVE LATER)
+//     console.warn("⚠ Bypass mode active: Admin login always succeeds!");
+//     toast.success("Admin login bypass active — logged in!");
+
+//     // Fake admin user
+//     const fakeAdmin = {
+//         user: {
+//             id: "temp-admin",
+//             email: credentials.email,
+//             role: "admin"
+//         }
+//     };
+
+//     // Save fake user in cache
+//     queryClient.setQueryData(["auth-status"], fakeAdmin);
+
+//     // Redirect
+//     router.push("/admin");
+
+//     return { success: true, data: fakeAdmin };
+// };
+
+
     // Logout (works for both wallet and admin)
     const logout = async () => {
         try {

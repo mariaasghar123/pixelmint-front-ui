@@ -95,7 +95,7 @@ export default function Table({ columns, data, pageSize = 5, isLoading = false }
     };
 
     return (
-        <div className="bg-dark-800 rounded-2xl w-full overflow-hidden">
+        <div className="dark:bg-dark-800 bg-gray-300 rounded-2xl w-full overflow-hidden">
             {/* Desktop Table View */}
             <div className="hidden md:block">
                 <div className="overflow-x-auto">
@@ -103,7 +103,7 @@ export default function Table({ columns, data, pageSize = 5, isLoading = false }
                         <thead>
                             <tr className="bg-green-100 rounded-t-2xl">
                                 {columns.map((col) => (
-                                    <th key={col.key} className="text-left px-4 py-3 font-semibold text-dark-800 whitespace-nowrap">
+                                    <th key={col.key} className="text-left px-4 py-3 font-semibold dark:text-dark-800 whitespace-nowrap">
                                         {col.header}
                                     </th>
                                 ))}
@@ -115,9 +115,9 @@ export default function Table({ columns, data, pageSize = 5, isLoading = false }
                                     <SkeletonRow columns={columns} key={idx} />
                                 ))
                                 : paginatedData.map((row, i) => (
-                                    <tr key={i} className="border-b border-white/10">
+                                    <tr key={i} className="border-b dark:border-white/10">
                                         {columns.map((col) => (
-                                            <td key={col.key} className="px-4 py-4 align-middle text-light/40 whitespace-nowrap">
+                                            <td key={col.key} className="px-4 py-4 align-middle darK:text-light/40 text-black whitespace-nowrap">
                                                 {col.render ? col.render(row) : row[col.key]}
                                             </td>
                                         ))}
