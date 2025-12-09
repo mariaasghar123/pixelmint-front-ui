@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import UserIcon from "@/components/ui/UserIcon";
 import { usePathname } from "next/navigation";
 import ThemeSwitcher from "./ThemeSwitcher";
+import ThemeProvider from "./ThemeProviders";
 
 const MENU_ITEMS = [
   { label: "About", href: "https://tinyurl.com/MPMPitchDeck" },
@@ -123,7 +124,8 @@ export default function Navbar() {
               )}
             </div>
           )}
-          <ThemeSwitcher />
+           <ThemeSwitcher /> 
+          {/* <ThemeProvider></ThemeProvider> */}
         </div>
 
         <button
