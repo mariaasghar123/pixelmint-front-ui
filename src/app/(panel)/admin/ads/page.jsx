@@ -41,8 +41,8 @@ export default function PixelPurchasesPage() {
             key: "name",
             render: (row) => (
                 <div>
-                    <div className="font-semibold text-white">{row.name}</div>
-                    <div className="text-light/40 text-sm">{row.website}</div>
+                    <div className="font-semibold dark:text-white">{row.name}</div>
+                    <div className="dark:text-light/40 text-gray-700 text-sm">{row.website}</div>
                 </div>
             ),
         },
@@ -51,8 +51,8 @@ export default function PixelPurchasesPage() {
             key: "owner",
             render: (row) => (
                 <div>
-                    <div className="font-semibold text-white">{row.owner?.name || "N/A"}</div>
-                    <div className="text-light/40 text-sm">{row.owner?.email || "N/A"}</div>
+                    <div className="font-semibold dark:text-white">{row.owner?.name || "N/A"}</div>
+                    <div className="dark:text-light/40 text-gray-700 text-sm">{row.owner?.email || "N/A"}</div>
                 </div>
             ),
         },
@@ -61,8 +61,8 @@ export default function PixelPurchasesPage() {
             key: "pixels",
             render: (row) => (
                 <div>
-                    <div className="text-white">{row.pixels}</div>
-                    <div className="text-light/40 text-sm">{row.value}</div>
+                    <div className="dark:text-white">{row.pixels}</div>
+                    <div className="dark:text-light/40 text-gray-700 text-sm">{row.value}</div>
                 </div>
             ),
         },
@@ -72,8 +72,8 @@ export default function PixelPurchasesPage() {
             key: "date",
             render: (row) => (
                 <div>
-                    <div className="text-white">{row.date}</div>
-                    <div className="text-light/40 text-sm">{row.time}</div>
+                    <div className="dark:text-white">{row.date}</div>
+                    <div className="dark:text-light/40 text-gray-700 text-sm">{row.time}</div>
                 </div>
             ),
         },
@@ -88,7 +88,7 @@ export default function PixelPurchasesPage() {
                             background: "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
                         }}
                     >
-                        <Eye className="text-light w-5 h-5" />
+                        <Eye className="dark:text-light w-5 h-5" />
                     </button>
                     {(row.status === "Pending" || row.status === "Reported") && (
                         <>

@@ -24,8 +24,8 @@ export default function PaymentManagementPage() {
             key: "transaction",
             render: (row) => (
                 <div>
-                    <div className="font-semibold text-white truncate max-w-[200px]">{row.transaction}</div>
-                    <div className="text-light/40 text-sm">{row.date} at {row.time}</div>
+                    <div className="font-semibold dark:text-white truncate max-w-[200px]">{row.transaction}</div>
+                    <div className="dark:text-light/40 text-gray-700 text-sm">{row.date} at {row.time}</div>
                 </div>
             ),
         },
@@ -34,8 +34,8 @@ export default function PaymentManagementPage() {
             key: "user",
             render: (row) => (
                 <div>
-                    <div className="font-semibold text-white">{row.user.name}</div>
-                    <div className="text-light/40 text-sm">{row.user.email}</div>
+                    <div className="font-semibold dark:text-white">{row.user.name}</div>
+                    <div className="dark:text-light/40 text-gray-700 text-sm">{row.user.email}</div>
                 </div>
             ),
         },
@@ -43,7 +43,7 @@ export default function PaymentManagementPage() {
             header: "Amount (USDT)",
             key: "amount",
             render: (row) => (
-                <div className="text-white">{row.amount.toLocaleString()}</div>
+                <div className="dark:text-white">{row.amount.toLocaleString()}</div>
             ),
         },
         {
@@ -90,7 +90,7 @@ export default function PaymentManagementPage() {
                                 background: "linear-gradient(90deg, rgba(192, 192, 192, 0.1) 0%, rgba(192, 192, 192, 0.05) 100%)"
                             }}
                         >
-                            <ExternalLink className="text-light w-5 h-5" />
+                            <ExternalLink className="dark:text-light w-5 h-5" />
                         </a>
                     )}
                     {/* <button */}
