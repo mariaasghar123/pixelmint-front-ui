@@ -22,5 +22,5 @@ const TokenSelector = ({ tokens, selectedToken, register, errors }) => (
         {errors?.token && <p className="text-[#E0524D] text-sm mt-2">{errors.token.message}</p>}
     </div>
 );
-
+     
 export default TokenSelector;
