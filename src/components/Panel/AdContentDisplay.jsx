@@ -6,7 +6,7 @@ export default function AdContentDisplay({ ad }) {
   const websiteUrl = ad?.websiteUrl || "-";
 
   return (
-    <div className="bg-dark-700 rounded-xl p-6 mb-7">
+    <div className="dark:bg-dark-700 bg-gray-300 rounded-xl p-6 mb-7">
       <h3 className="font-bold text-lg mb-5">Ad Content</h3>
       <div className="flex flex-col items-center justify-center border border-[#208A54] rounded-lg p-6 mb-6">
         {adImageUrl ? (
@@ -40,17 +40,17 @@ export default function AdContentDisplay({ ad }) {
           </>
         )}
         <div className="text-xl font-bold mb-2 text-center">{adTitle}</div>
-        <div className="text-light/60 text-center">
+        <div className="dark:text-light/60 text-gray-600 text-center">
           {adTitle}
         </div>
       </div>
       <div className="mb-4">
         <div className="font-bold mb-1">Title</div>
-        <div className="text-light/90">{adTitle}</div>
+        <div className="dark:text-light/90 text-gray-600">{adTitle}</div>
       </div>
       <div>
         <div className="font-bold mb-1">Target URL</div>
-        <div className="text-light/90">{websiteUrl}</div>
+        <div className="dark:text-light/90 text-gray-600">{websiteUrl}</div>
       </div>
     </div>
   );

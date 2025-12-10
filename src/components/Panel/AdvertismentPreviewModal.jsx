@@ -59,7 +59,7 @@ export default function AdvertisementPreviewModal({ isOpen, onClose, ad }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-800 rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto font-pixel border border-[#208A54]">
+      <div className="dark:bg-dark-800 bg-dark-300 rounded-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto font-pixel border border-[#208A54]">
         {/* Header */}
         <div className="flex items-center justify-between mb-7">
           <h2 className="text-3xl font-semibold font-ari">
@@ -67,7 +67,7 @@ export default function AdvertisementPreviewModal({ isOpen, onClose, ad }) {
           </h2>
           <button
             onClick={handleClose}
-            className=" hover:text-gray-300 transition-colors"
+            className=" dark:hover:text-gray-300 hover:text-gray-500 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -77,22 +77,22 @@ export default function AdvertisementPreviewModal({ isOpen, onClose, ad }) {
         <AdContentDisplay ad={ad} />
 
         {/* Owner / Statistics */}
-        <div className="bg-dark-700 rounded-xl p-6 mb-7">
+        <div className="dark:bg-dark-700 bg-gray-300 rounded-xl p-6 mb-7">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-dark-800"></div>
+              <div className="w-12 h-12 rounded-full dark:bg-dark-800 bg-dark-100"></div>
               <div>
                 <div className="font-semibold text-lg">{displayName}</div>
               </div>
             </div>
-            <span className="flex items-center gap-2 bg-green-100/20 px-3 py-1 rounded-full text-green-100 text-sm font-semibold">
+            <span className="flex items-center gap-2 dark:bg-green-100/20 bg-dark-300 px-3 py-1 rounded-full dark:text-green-100 text-sm font-semibold">
               <span className="w-2 h-2 bg-green-400 rounded-full"></span>
               {status}
             </span>
           </div>
           <div className="mt-4">
             <div className="font-bold mb-2">Statistics</div>
-            <div className="flex gap-10 text-light/80">
+            <div className="flex gap-10 dark:text-light/80 text-gray-600">
               <div>
                 <span className="font-bold text-green-400">{pixels}</span>{" "}
                 Pixels
@@ -108,10 +108,10 @@ export default function AdvertisementPreviewModal({ isOpen, onClose, ad }) {
         </div>
 
         {/* Moderation Notes */}
-        <div className="bg-dark-700 rounded-xl p-6 mb-7">
+        <div className="dark:bg-dark-700 bg-gray-300 rounded-xl p-6 mb-7">
           <div className="font-bold mb-2">Moderation Notes</div>
           <textarea
-            className={`w-full text-light/80 p-3 rounded-lg border ${!!error ? "border-error" : "border-border"} resize-none`}
+            className={`w-full dark:text-light/80 p-3 rounded-lg border border-black${!!error ? "border-error" : "border-border"} resize-none`}
             rows={3}
             placeholder="Add notes or rejection reason (optional)"
             value={moderatorNote}
