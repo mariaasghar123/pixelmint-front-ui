@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Sun, Moon } from "lucide-react";
 
 export default function ThemeSwitcher() {
   const [theme, setTheme] = useState("dark");
@@ -54,7 +55,7 @@ export default function ThemeSwitcher() {
             ? "translate-x-10 bg-gradient-to-br from-gray-800 to-gray-900 text-white"
             : "translate-x-0 bg-gradient-to-br from-white to-gray-100 text-amber-500"}`}
       >
-        {theme === "dark" ? "🌙" : "☀"}
+        {theme === "dark" ? <Moon size={22} /> : <Sun size={22} />}
       </span>
     </button>
   );
